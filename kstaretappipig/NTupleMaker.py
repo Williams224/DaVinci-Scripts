@@ -1,4 +1,4 @@
-from Gaudi.Configuration import *
+sfrom Gaudi.Configuration import *
 from Configurables import DaVinci
 #from Configurables import AlgTool
 from Configurables import GaudiSequencer
