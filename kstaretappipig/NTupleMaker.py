@@ -165,7 +165,7 @@ from Configurables import MCDecayTreeTuple
 mctuple=MCDecayTreeTuple("mctuple")
 mctuple.ToolList+=["MCTupleToolKinematic","MCTupleToolReconstructed","MCTupleToolHierarchy","MCTupleToolDecayType","MCTupleToolPID"]
 
-mctuple.Decay="[B0 -> ^(K*(892)0 -> ^K+ ^pi-) ^(eta_prime -> ^rho0 ^gamma)]CC"
+mctuple.Decay="[B0 -> ^(K*(892)0 -> ^K+ ^pi-) ^(eta_prime -> ^rho(770)0 ^gamma)]CC"
 
 MySequencer.Members.append(etuple)
 MySequencer.Members.append(tuple)
