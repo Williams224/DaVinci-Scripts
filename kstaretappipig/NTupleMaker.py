@@ -87,22 +87,10 @@ tuple.ToolList += [
     , "TupleToolPhotonInfo"
     , "TupleToolMCTruth"
     , "TupleToolMCBackgroundInfo"
-   # , "MCTupleTOolHierachy"
     , "TupleToolCaloHypo"
     , "TupleToolTrackIsolation"
-    #, "TupleToolTagging" not used in microdst
     ]
 
-#from Configurables import TupleToolMCTruth
-#from TupleToolMCTruth.Configuration import *
-
-#tuple.addTool(TupleToolMCTruth,name="TruthM")
-#tuple.ToolList+= [ "TupleToolMCTruth/TruthM"]
-#tuple.TruthM.ToolList = ["MCTupleToolHierachy/Hierachy"]
-#tuple.TruthM.addTool(MCTupleToolHierachy,name="Hierachy")
-#tuple.TupleToolMCTruth.addTool(MCTupleToolKinematic,name="MCTupleToolKinematic")
-#tuple.TupleToolMCTruth.addTool(MCTupleToolHierachy,name="MCTupleToolHierachy")
-#tuple.TupleToolMCTruth.addTool(MCTupleToolPID,name="MCTupleToolPID")
 
 tuple.addTool(TupleToolDecay,name="B0")
 
@@ -124,6 +112,16 @@ tuple.B0.Conskstar_etap.daughtersToConstrain = ["K*(892)0","eta_prime"]
 tuple.B0.addTupleTool('TupleToolDecayTreeFitter/Consnothing')
 tuple.B0.Consnothing.Verbose=True
 tuple.B0.Consnothing.constrainToOriginVertex=False
+
+from LoKiPhys.decorators import MAXTREE,MINTREE,ISBASIC,HASTRACK,SUMTREE,PT,ABSID,NINTREE
+B0_hybrid=tuple.B0.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_B0')
+
+preamble=[
+    'TRACK_MAX_PT= MAXTREE(ISBASIC & HASTRACK, PT, -666)'
+    'TRACK_MIN_PT= MINTREE(ISBASIC & HASTRACK, PT, -667)'
+    'SUMTRACK_PT= SUMTREE(PT)'
+    ]
+B0_hybrid.Preambulo=preamble
 
 
 
