@@ -14,14 +14,19 @@ DaVinci.CondDBtag='sim-20130522-1-vc-mu100'
 simulation=True
 
 
+
 #################################################################
 #Rerun with stripping21 applied
 
 if simulation:
+    from Configurables import EventNodeKiller
     from StrippingConf.Configuration import StrippingConf, StrippingStream
     from StrippingSettings.Utils import strippingConfiguration
     from StrippingArchive.Utils import buildStreams
     from StrippingArchive import strippingArchive
+
+    event_node_killer=EventNodeKiller('StripKiller')
+    event_node_killer.Nodes=['Event/AllStreams','/Event/Strip']
 
     from Configurables import PhysConf
     PhysConf().CaloReProcessing=True
@@ -47,7 +52,7 @@ if simulation:
                       AcceptBadEvents = False,
                       BadEventSelection = filterBadEvents)
 
-    DaVinci().appendToMainSequence([sc.sequence()])
+    DaVinci().appendToMainSequence([event_node_killer,sc.sequence()])
     
 
             
@@ -55,10 +60,13 @@ if simulation:
 from Configurables import DecayTreeTuple
 from Configurables import TupleToolL0Calo
 from DecayTreeTuple.Configuration import *
+
+line = 'B2XEtaB2etapKstarLine'
+
 tuple=DecayTreeTuple()
 tuple.Decay="[B0 -> ^(K*(892)0 -> ^K+ ^pi-) ^(eta_prime -> ^pi- ^pi+ ^gamma)]CC"
 tuple.Branches={"B0":"[B0 -> (K*(892)0 -> K+ pi-) (eta_prime -> pi- pi+ gamma)]CC"}
-tuple.Inputs=["Phys/B2XEtaB2etapKstarLine/Particles"]
+tuple.Inputs=['/Event/Phys/{0}/Particles'.format(line)]
 tuple.addTool(TupleToolL0Calo())
 tuple.TupleToolL0Calo.TriggerClusterLocation="/Event/Trig/L0/Calo"
 tuple.TupleToolL0Calo.WhichCalo="HCAL"
