@@ -104,17 +104,29 @@ tuple.ToolList += [
 #tuple.TupleToolMCTruth.addTool(MCTupleToolHierachy,name="MCTupleToolHierachy")
 #tuple.TupleToolMCTruth.addTool(MCTupleToolPID,name="MCTupleToolPID")
 
-
-#####Look at adding branchesss##############
 tuple.addTool(TupleToolDecay,name="B0")
 
 from Configurables import TupleToolDecayTreeFitter
 
-tuple.B0.addTool(TupleToolDecayTreeFitter("PVFit"))
-tuple.B0.PVFit.Verbose=True
-tuple.B0.PVFit.constrainToOriginVertex=True
-tuple.B0.PVFit.daughtersToConstrain = ["K*(892)0","eta_prime"]
-tuple.B0.ToolList+=["TupleToolDecayTreeFitter/PVFit"]
+#========================================REFIT WITH DAUGHTERS AND PV CONSTRAINED==============================
+tuple.B0.addTupleTool('TupleToolDecayTreeFitter/ConsPV_kstar_etap')
+tuple.B0.ConsPV_kstar_etap.Verbose=True
+tuple.B0.ConsPV_kstar_etap.constrainToOriginVertex=True
+tuple.B0.ConsPV_kstar_etap.daughtersToConstrain = ["K*(892)0","eta_prime"]
+
+#========================================REFIT WITH JUST DAUGHTERS CONSTRAINED================================
+tuple.B0.addTupleTool('TupleToolDecayTreeFitter/Conskstar_etap')
+tuple.B0.Conskstar_etap.Verbose=True
+tuple.B0.Conskstar_etap.constrainToOriginVertex=False
+tuple.B0.Conskstar_etap.daughtersToConstrain = ["K*(892)0","eta_prime"]
+
+#========================================REFIT WITH NOTHING CONSTRAINED========================================
+tuple.B0.addTupleTool('TupleToolDecayTreeFitter/Consnothing')
+tuple.B0.Consnothing.Verbose=True
+tuple.B0.Consnothing.constrainToOriginVertex=False
+
+
+
                  
 
 from Configurables import TupleToolTISTOS
@@ -153,7 +165,7 @@ from Configurables import MCDecayTreeTuple
 mctuple=MCDecayTreeTuple("mctuple")
 mctuple.ToolList+=["MCTupleToolKinematic","MCTupleToolReconstructed","MCTupleToolHierarchy","MCTupleToolDecayType","MCTupleToolPID"]
 
-mctuple.Decay="[B0 -> ^(K*(892)0 -> ^K+ ^pi-) ^(eta_prime -> ^pi- ^pi+ ^gamma)]CC"
+mctuple.Decay="[B0 -> ^(K*(892)0 -> ^K+ ^pi-) ^(eta_prime -> ^rho0 ^gamma)]CC"
 
 MySequencer.Members.append(etuple)
 MySequencer.Members.append(tuple)
