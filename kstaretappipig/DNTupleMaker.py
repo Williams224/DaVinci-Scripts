@@ -4,17 +4,15 @@ from Configurables import DaVinci
 
 simulation=False
 
-from Configurables import EventNodeKiller
-eventNodeKiller = EventNodeKiller('DAQkiller')
-eventNodeKiller.Nodes = ['DAQ','pRec']
-#MySequencer.Members+=[eventNodeKiller]
+stream='Bhadron'
+line='B2XEtaB2etapKstarLine'
 
 from Configurables import DecayTreeTuple
 from DecayTreeTuple.Configuration import *
 tuple=DecayTreeTuple()
 tuple.Decay="[B0 -> ^(K*(892)0 -> ^K+ ^pi-) ^(eta_prime -> ^pi- ^pi+ ^gamma)]CC"
 tuple.Branches={"B0":"[B0 -> (K*(892)0 -> K+ pi-) (eta_prime -> pi- pi+ gamma)]CC"}
-tuple.Inputs=["/Event/Bhadron/Phys/B2XEtaB2etapKstarLine/Particles"]
+tuple.Inputs=['Phys/{0}/Particles'.format(line)]
 
 tuple.ToolList += [
     "TupleToolGeometry"
@@ -74,18 +72,25 @@ tistos.TriggerList=["L0PhotonDecision",
 
 
 DaVinci().InputType='MDST'
-#DaVinci().RootInTES='/Event/Bhadron/'
-DaVinci().UserAlgorithms+=[eventNodeKiller,tuple]
+DaVinci().RootInTES='/Event/{0}'.format(stream)
+DaVinci().UserAlgorithms+=[tuple]
 DaVinci().TupleFile="Output.root"
 DaVinci().HistogramFile="histos.root"
 DaVinci().DataType='2012'
 DaVinci().EvtMax=-1
+DaVinci().Lumi=True
 DaVinci().PrintFreq=1000
 DaVinci().MoniSequence=[tuple]
 DaVinci().Simulation=False
 
 
-                   
+from GaudiConf import IOHelper
+
+# Use the local input data
+IOHelper().inputFiles([
+        './00041836_00000057_1.bhadron.mdst'
+        ], clear=True)
+
 
 
 
