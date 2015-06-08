@@ -1,6 +1,6 @@
 from Gaudi.Configuration import *
-from Configurables import GaudiSequencer
 from Configurables import DaVinci
+from Configurables import GaudiSequencer
 
 simulation=False
 
@@ -33,13 +33,43 @@ tuple.ToolList += [
     ]
 
 tuple.addTool(TupleToolDecay,name="B0")
+
 from Configurables import TupleToolDecayTreeFitter
 
-tuple.B0.addTool(TupleToolDecayTreeFitter("PVFit"))
+#===========================REFIT WITH DAUGHTERS AND PV CONSTRAINED======================
+tuple.B0.addTupleTool('TupleToolDecayTreeFitter/PVFit')
 tuple.B0.PVFit.Verbose=True
 tuple.B0.PVFit.constrainToOriginVertex=True
 tuple.B0.PVFit.daughtersToConstrain = ["K*(892)0","eta_prime"]
-tuple.B0.ToolList+=["TupleToolDecayTreeFitter/PVFit"]
+
+#========================================REFIT WITH JUST DAUGHTERS CONSTRAINED================================
+tuple.B0.addTupleTool('TupleToolDecayTreeFitter/Conskstar_etap')
+tuple.B0.Conskstar_etap.Verbose=True
+tuple.B0.Conskstar_etap.constrainToOriginVertex=False
+tuple.B0.Conskstar_etap.daughtersToConstrain = ["K*(892)0","eta_prime"]
+
+#========================================REFIT WITH NOTHING CONSTRAINED========================================
+tuple.B0.addTupleTool('TupleToolDecayTreeFitter/Consnothing')
+tuple.B0.Consnothing.Verbose=True
+tuple.B0.Consnothing.constrainToOriginVertex=False
+
+from LoKiPhys.decorators import MAXTREE,MINTREE,ISBASIC,HASTRACK,SUMTREE,PT,ABSID,NINTREE,
+B0_hybrid=tuple.B0.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_B0')
+
+preamble=[
+    'TRACK_MAX_PT= MAXTREE(PT, ISBASIC & HASTRACK, -666)',
+    'TRACK_MIN_PT= MINTREE(PT, ISBASIC & HASTRACK)',
+    'SUMTRACK_PT= SUMTREE((211 == ABSID)|(-211 == ABSID)|(321 == ABSID)|(-321 == ABSID),PT)'
+    ]
+B0_hybrid.Preambulo=preamble
+
+B0_hybrid.Variables = {
+    'max_pt_track' : 'TRACK_MAX_PT',
+    'min_pt_track' : 'TRACK_MIN_PT',
+    'sum_track_pt' : 'SUMTRACK_PT',
+    'n_highpt_tracks' : 'NINTREE(ISBASIC & HASTRACK & (PT>250.0*MeV))'
+    }
+
 
 from Configurables import TupleToolTISTOS
 tistos = tuple.B0.addTupleTool(TupleToolTISTOS, name="TupleToolTISTOS")
