@@ -1,4 +1,4 @@
-sfrom Gaudi.Configuration import *
+from Gaudi.Configuration import *
 from Configurables import DaVinci
 #from Configurables import AlgTool
 from Configurables import GaudiSequencer
@@ -97,10 +97,10 @@ tuple.addTool(TupleToolDecay,name="B0")
 from Configurables import TupleToolDecayTreeFitter
 
 #========================================REFIT WITH DAUGHTERS AND PV CONSTRAINED==============================
-tuple.B0.addTupleTool('TupleToolDecayTreeFitter/ConsPV_kstar_etap')
-tuple.B0.ConsPV_kstar_etap.Verbose=True
-tuple.B0.ConsPV_kstar_etap.constrainToOriginVertex=True
-tuple.B0.ConsPV_kstar_etap.daughtersToConstrain = ["K*(892)0","eta_prime"]
+tuple.B0.addTupleTool('TupleToolDecayTreeFitter/PVFit')
+tuple.B0.PVFit.Verbose=True
+tuple.B0.PVFit.constrainToOriginVertex=True
+tuple.B0.PVFit.daughtersToConstrain = ["K*(892)0","eta_prime"]
 
 #========================================REFIT WITH JUST DAUGHTERS CONSTRAINED================================
 tuple.B0.addTupleTool('TupleToolDecayTreeFitter/Conskstar_etap')
@@ -119,10 +119,16 @@ B0_hybrid=tuple.B0.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_B0')
 preamble=[
     'TRACK_MAX_PT= MAXTREE(ISBASIC & HASTRACK, PT, -666)'
     'TRACK_MIN_PT= MINTREE(ISBASIC & HASTRACK, PT, -667)'
-    'SUMTRACK_PT= SUMTREE(PT)'
+    'SUMTRACK_PT= SUMTREE((211 == ABSID)|(-211 == ABSID)|(321 == ABSID)|(-321 == ABSID),PT)'
     ]
 B0_hybrid.Preambulo=preamble
 
+B0_hybrid.Variables = {
+    'max_pt_track' : 'TRACK_MAX_PT',
+    'min_pt_track' : 'TRACK_MIN_PT',
+    'sum_track_pt' : 'SUMTRACK_PT',
+    'n_highpt_tracks' : 'NINTREE(ISBASIC & HASTRACK & (PT>250.0*MeV)'
+    }
 
 
                  
@@ -174,7 +180,7 @@ DaVinci().UserAlgorithms+=[MySequencer]
 DaVinci().TupleFile="Output.root"
 DaVinci().HistogramFile="histos.root"
 DaVinci().DataType='2012'
-DaVinci().EvtMax=-1
+DaVinci().EvtMax=1000
 DaVinci().PrintFreq=1000
 DaVinci().MoniSequence=[tuple]
 DaVinci().Simulation=simulation
