@@ -117,8 +117,8 @@ from LoKiPhys.decorators import MAXTREE,MINTREE,ISBASIC,HASTRACK,SUMTREE,PT,ABSI
 B0_hybrid=tuple.B0.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_B0')
 
 preamble=[
-    'TRACK_MAX_PT= MAXTREE(ISBASIC & HASTRACK, PT, -666)'
-    'TRACK_MIN_PT= MINTREE(ISBASIC & HASTRACK, PT, -667)'
+    'TRACK_MAX_PT= MAXTREE(PT, ISBASIC & HASTRACK, -666)',
+    'TRACK_MIN_PT= MINTREE(PT, ISBASIC & HASTRACK)',
     'SUMTRACK_PT= SUMTREE((211 == ABSID)|(-211 == ABSID)|(321 == ABSID)|(-321 == ABSID),PT)'
     ]
 B0_hybrid.Preambulo=preamble
@@ -127,7 +127,7 @@ B0_hybrid.Variables = {
     'max_pt_track' : 'TRACK_MAX_PT',
     'min_pt_track' : 'TRACK_MIN_PT',
     'sum_track_pt' : 'SUMTRACK_PT',
-    'n_highpt_tracks' : 'NINTREE(ISBASIC & HASTRACK & (PT>250.0*MeV)'
+    'n_highpt_tracks' : 'NINTREE(ISBASIC & HASTRACK & (PT>250.0*MeV))'
     }
 
 
