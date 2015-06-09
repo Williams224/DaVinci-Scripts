@@ -5,7 +5,7 @@ from Configurables import GaudiSequencer
 MySequencer = GaudiSequencer('Sequence')
 #For 2012 MC
 DaVinci.DDDBtag='dddb-20130929-1'
-DaVinci.CondDBtag='sim-20130522-1-vc-md100'
+DaVinci.CondDBtag='sim-20130522-1-vc-mu100'
 
 #for 2011 MC
 #DaVinci.DDDBtag='dddb-20130929'
