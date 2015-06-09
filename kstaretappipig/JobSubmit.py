@@ -3,7 +3,7 @@
 import getpass
 from distutils.util import strtobool
 
-polarity='MagDown'
+polarity='MagUp'
 datatype='Data'
 
 b=Job()
