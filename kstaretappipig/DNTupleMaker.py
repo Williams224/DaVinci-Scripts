@@ -53,13 +53,31 @@ tuple.B0.addTupleTool('TupleToolDecayTreeFitter/Consnothing')
 tuple.B0.Consnothing.Verbose=True
 tuple.B0.Consnothing.constrainToOriginVertex=False
 
-from LoKiPhys.decorators import MAXTREE,MINTREE,ISBASIC,HASTRACK,SUMTREE,PT,ABSID,NINTREE,
+########################################=LOKI FUNCOR VARIABLES===============================================
+
+tuple.addBranches({'Kstar' : '[B0 -> ^(K*(892)0 -> K+ pi-) (eta_prime -> pi- pi+ gamma)]CC',
+                   'eta_prime' : '[B0 -> (K*(892)0 -> K+ pi-) ^(eta_prime -> pi- pi+ gamma)]CC',
+                   'Kplus' : '[B0 -> (K*(892)0 -> ^K+ pi-) (eta_prime -> pi- pi+ gamma)]CC',
+                   'piminus' : '[B0 -> (K*(892)0 -> K+ ^pi-) (eta_prime -> pi- pi+ gamma)]CC',
+                   'piplus' : '[B0 -> (K*(892)0 -> K+ pi-) (eta_prime -> pi- ^pi+ gamma)]CC',
+                   'piminus0' : '[B0 -> (K*(892)0 -> K+ pi-) (eta_prime -> ^pi- pi+ gamma)]CC',
+                   'gamma' : '[B0 -> (K*(892)0 -> K+ pi-) (eta_prime -> pi- pi+ ^gamma)]CC'})
+
+from LoKiPhys.decorators import MAXTREE,MINTREE,ISBASIC,HASTRACK,SUMTREE,PT,ABSID,NINTREE,ETA,TRPCHI2
 B0_hybrid=tuple.B0.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_B0')
+Kstar_hybrid=tuple.Kstar.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_Kstar')
+eta_prime_hybrid=tuple.eta_prime.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_eta_prime')
+Kplus_hybrid=tuple.Kplus.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_Kplus')
+piminus_hybrid=tuple.piminus.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_piminus')
+piplus_hybrid=tuple.piplus.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_piplus')
+piminus0_hybrid=tuple.piminus0.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_piminus0')
+gamma_hybrid=tuple.gamma.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_gamma')
 
 preamble=[
     'TRACK_MAX_PT= MAXTREE(PT, ISBASIC & HASTRACK, -666)',
     'TRACK_MIN_PT= MINTREE(PT, ISBASIC & HASTRACK)',
-    'SUMTRACK_PT= SUMTREE((211 == ABSID)|(-211 == ABSID)|(321 == ABSID)|(-321 == ABSID),PT)'
+    'SUMTRACK_PT= SUMTREE((211 == ABSID)|(-211 == ABSID)|(321 == ABSID)|(-321 == ABSID),PT)',
+    'SUM_PCHI2= SUMTREE((211 == ABSID)|(-211 == ABSID)|(321 == ABSID)|(-321 == ABSID),TRPCHI2)'
     ]
 B0_hybrid.Preambulo=preamble
 
@@ -67,8 +85,43 @@ B0_hybrid.Variables = {
     'max_pt_track' : 'TRACK_MAX_PT',
     'min_pt_track' : 'TRACK_MIN_PT',
     'sum_track_pt' : 'SUMTRACK_PT',
-    'n_highpt_tracks' : 'NINTREE(ISBASIC & HASTRACK & (PT>250.0*MeV))'
+    'sum_pchi2' : 'SUM_PCHI2',
+    'n_highpt_tracks' : 'NINTREE(ISBASIC & HASTRACK & (PT>250.0*MeV))',
+    'eta':'ETA'
     }
+
+Kstar_hybrid.Variables ={
+    'branch_mass':'MM',
+    'eta': 'ETA'
+ }
+
+eta_prime_hybrid.Variables ={
+    'branch_mass':'MM',
+    'eta': 'ETA'
+    }
+
+Kplus_hybrid.Variables ={
+    'eta': 'ETA'
+    }
+
+piminus_hybrid.Variables ={
+    'eta': 'ETA'
+    }
+
+piplus_hybrid.Variables ={
+    'eta': 'ETA'
+    }
+
+piminus0_hybrid.Variables ={
+    'eta': 'ETA'
+    }
+
+gamma_hybrid.Variables = {
+    'eta':'ETA'
+    }
+
+
+#==============================TRIGGER DECISIONS==============================
 
 
 from Configurables import TupleToolTISTOS
