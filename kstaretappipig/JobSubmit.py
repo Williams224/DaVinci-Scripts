@@ -3,8 +3,8 @@
 import getpass
 from distutils.util import strtobool
 
-polarity='MagUp'
-datatype='Data'
+polarity='MagDown'
+datatype='MC'
 
 b=Job()
 b.application=DaVinci(version="v36r5")
@@ -13,9 +13,9 @@ if datatype=='MC':
 if datatype=='Data':
     b.application.optsfile='DNTupleMaker.py'
 b.outputfiles=[DiracFile('Output.root')]
-b.inputdata = b.application.readInputData('{0}_12_{1}_Kstar_etap_pipig.py'.format(datatype,polarity))
-b.comment='{0}_12_{1}_kstar_etap_pipig'.format(datatype,polarity)
-b.splitter = SplitByFiles(filesPerJob=5)
+b.inputdata = b.application.readInputData('{0}_12_{1}_kstar_rho_kpipipi.py'.format(datatype,polarity))
+b.comment='{0}_12_{1}_kstar_rho_kpipipi'.format(datatype,polarity)
+b.splitter = SplitByFiles(filesPerJob=2)
 #b.OutputSandbox=["stderr","stdout"]
 
 b.backend=Dirac()
