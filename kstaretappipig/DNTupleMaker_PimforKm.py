@@ -183,7 +183,10 @@ tistos.TriggerList=["L0PhotonDecision",
                     "Hlt2Topo3BodySimpleDecision",
                     "Hlt2Topo4BodySimpleDecision"]
 
-
+seq=GaudiSequencer('MyTupleSeq')
+seq.Members += [selSeq.sequence()]
+seq.Members +=[tuple]
+DaVinci().appendToMainSequence([seq])
 DaVinci().InputType='MDST'
 DaVinci().RootInTES='/Event/{0}'.format(stream)
 DaVinci().UserAlgorithms+=[tuple]
@@ -199,10 +202,10 @@ DaVinci().Simulation=False
 
 from GaudiConf import IOHelper
 
-# Use the local input data
+Use the local input data
 IOHelper().inputFiles([
-       './00041836_00000057_1.bhadron.mdst'
-        ], clear=True)
+      './00041836_00000057_1.bhadron.mdst'
+      ], clear=True)
 
 
 
