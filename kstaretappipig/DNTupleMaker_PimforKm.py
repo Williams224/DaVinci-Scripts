@@ -14,8 +14,8 @@ subs = SubstitutePID(
     Code = "DECTREE('[B0 -> (K*(892)0 -> K+ pi-) (eta_prime -> pi- pi+ gamma)]CC')",
     # note that SubstitutePID can't handle automatic CC
     Substitutions = {
-    'Bottom -> (K*(892)0 -> K+ ^pi-) Meson': 'K-',
-    'Bottom -> (K*(892)~0 -> K- ^pi+) Meson': 'K+',
+    'Bottom -> (Meson -> K+ ^pi-) Meson': 'K-',
+    'Bottom -> (Meson -> K- ^pi+) Meson': 'K+',
     }
 )
 
@@ -30,7 +30,7 @@ strippingSels = [DataOnDemand(Location=tesLoc)]
 
 # create a selection using the substitution algorithm
 selSub = Selection(
-    'KpforPip_sel',
+    'PimforKm_sel',
     Algorithm=subs,
     RequiredSelections=strippingSels
 )
@@ -41,8 +41,8 @@ selSeq = SelectionSequence('selSeq', TopSelection=selSub)
 from Configurables import DecayTreeTuple
 from DecayTreeTuple.Configuration import *
 tuple=DecayTreeTuple("PimforKmTuple")
-tuple.Decay="[B0 -> ^(K*(892)0 -> ^K+ ^K-) ^(eta_prime -> ^pi- ^pi+ ^gamma)]CC"
-tuple.Branches={"B0":"[B0 -> (K*(892)0 -> K+ K-) (eta_prime -> pi- pi+ gamma)]CC"}
+tuple.Decay="[B0 -> ^(Meson -> ^K+ ^K-) ^(eta_prime -> ^pi- ^pi+ ^gamma)]CC"
+tuple.Branches={"B0":"[B0 -> (Meson -> K+ K-) (eta_prime -> pi- pi+ gamma)]CC"}
 tuple.Inputs=[selSeq.outputLocation()]
 
 tuple.ToolList += [
