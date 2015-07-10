@@ -119,6 +119,25 @@ piminus0_hybrid.Variables ={
 gamma_hybrid.Variables = {
     'eta':'ETA'
     }
+#==============================MassSubs=====================================
+from Configurables import TupleToolSubMass
+
+tuple.B0.addTool(TupleToolSubMass)
+tuple.B0.ToolList += ["TupleToolSubMass"]
+tuple.B0.TupleToolSubMass.Substitution += ["pi- => K-"]
+tuple.B0.TupleToolSubMass.Substitution += ["K+ => pi+"]
+tuple.B0.TupleToolSubMass.Substitution += ["pi+ => K+"]
+tuple.B0.TupleToolSubMass.Substitution += ["pi+ => p+"]
+tuple.B0.TupleToolSubMass.Substitution += ["pi- => p~-"]
+tuple.B0.TupleToolSubMass.Substitution += ["K+ => p+"]
+tuple.B0.TupleToolSubMass.Substitution += ["gamma => pi0"]
+tuple.B0.TupleToolSubMass.Substitution += ["gamma => e-"]
+tuple.B0.TupleToolSubMass.Substitution += ["gamma => e+"]
+tuple.B0.TupleToolSubMass.Substitution += ["pi- => mu-"]
+tuple.B0.TupleToolSubMass.Substitution += ["pi+ => mu+"]
+tuple.B0.TupleToolSubMass.DoubleSubstitution += ["K+/pi- => pi+/K-"]
+tuple.B0.TupleToolSubMass.DoubleSubstitution += ["pi+/pi- => pi-/pi+"]
+tuple.B0.TupleToolSubMass.DoubleSubstitution += ["pi+/pi- => mu+/mu-"]
 
 
 #==============================TRIGGER DECISIONS==============================
@@ -166,12 +185,12 @@ DaVinci().MoniSequence=[tuple]
 DaVinci().Simulation=False
 
 
-#from GaudiConf import IOHelper
+from GaudiConf import IOHelper
 
 # Use the local input data
-#IOHelper().inputFiles([
- #       './00041836_00000057_1.bhadron.mdst'
-  #      ], clear=True)
+IOHelper().inputFiles([
+        './00041836_00000057_1.bhadron.mdst'
+        ], clear=True)
 
 
 

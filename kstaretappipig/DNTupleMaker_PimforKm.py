@@ -1,7 +1,8 @@
 from Gaudi.Configuration import *
 from Configurables import DaVinci
 from Configurables import GaudiSequencer
-
+from Configurables import DecayTreeTuple
+from DecayTreeTuple.Configuration import *
 simulation=False
 
 stream='Bhadron'
@@ -37,11 +38,10 @@ selSub = Selection(
 selSeq = SelectionSequence('selSeq', TopSelection=selSub)
 
 
-from Configurables import DecayTreeTuple
-from DecayTreeTuple.Configuration import *
+
 tuple=DecayTreeTuple("PimforKmTuple")
 tuple.Inputs=[selSeq.outputLocation()]
-tuple.Decay="[B0 -> ^(K*(892)0 -> ^K+ ^K-) ^(eta_prime -> ^pi- ^pi+ ^gamma)]CC"
+tuple.Decay="[B0 -> ^(K*(892)0 -> ^K+ ^K-) ^(eta_prime -> ^pi- ^pi+ ^gamma))]CC"
 tuple.Branches={"B0":"[B0 -> (K*(892)0 -> K+ K-) (eta_prime -> pi- pi+ gamma)]CC"}
 
 
