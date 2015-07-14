@@ -37,7 +37,7 @@ if simulation:
     streams=buildStreams(stripping=config,archive=archive)
 
     MyStream= StrippingStream("MyStream")
-    MyLines= ["StrippingB2XEtaB2etapKstarLine"]
+    MyLines= ["StrippingB2XEtaB2eta3piKstarLine"]
 
     for stream in streams:
         for line in stream.lines:
@@ -61,11 +61,11 @@ from Configurables import DecayTreeTuple
 from Configurables import TupleToolL0Calo
 from DecayTreeTuple.Configuration import *
 
-line = 'B2XEtaB2etapKstarLine'
+line = 'B2XEtaB2eta3piKstarLine'
 
 tuple=DecayTreeTuple()
-tuple.Decay="[B0 -> ^(K*(892)0 -> ^K+ ^pi-) ^(eta_prime -> ^pi- ^pi+ ^gamma)]CC"
-tuple.Branches={"B0":"[B0 -> (K*(892)0 -> K+ pi-) (eta_prime -> pi- pi+ gamma)]CC"}
+tuple.Decay="[B0 -> ^(K*(892)0 -> ^K+ ^pi-) ^(eta -> ^pi- ^pi+ ^(pi0 -> ^gamma ^gamma))]CC"
+tuple.Branches={"B0":"[B0 -> (K*(892)0 -> K+ pi-) (eta -> pi- pi+ (pi0 -> ^gamma ^gamma))]CC"}
 tuple.Inputs=['/Event/Phys/{0}/Particles'.format(line)]
 tuple.addTool(TupleToolL0Calo())
 tuple.TupleToolL0Calo.TriggerClusterLocation="/Event/Trig/L0/Calo"
@@ -100,13 +100,13 @@ from Configurables import TupleToolDecayTreeFitter
 tuple.B0.addTupleTool('TupleToolDecayTreeFitter/PVFit')
 tuple.B0.PVFit.Verbose=True
 tuple.B0.PVFit.constrainToOriginVertex=True
-tuple.B0.PVFit.daughtersToConstrain = ["K*(892)0","eta_prime"]
+tuple.B0.PVFit.daughtersToConstrain = ["K*(892)0","eta"]
 
 #========================================REFIT WITH JUST DAUGHTERS CONSTRAINED================================
-tuple.B0.addTupleTool('TupleToolDecayTreeFitter/Conskstar_etap')
-tuple.B0.Conskstar_etap.Verbose=True
-tuple.B0.Conskstar_etap.constrainToOriginVertex=False
-tuple.B0.Conskstar_etap.daughtersToConstrain = ["K*(892)0","eta_prime"]
+tuple.B0.addTupleTool('TupleToolDecayTreeFitter/Conskstar_eta')
+tuple.B0.Conskstar_eta.Verbose=True
+tuple.B0.Conskstar_eta.constrainToOriginVertex=False
+tuple.B0.Conskstar_eta.daughtersToConstrain = ["K*(892)0","eta"]
 
 #========================================REFIT WITH NOTHING CONSTRAINED========================================
 tuple.B0.addTupleTool('TupleToolDecayTreeFitter/Consnothing')
@@ -115,24 +115,28 @@ tuple.B0.Consnothing.constrainToOriginVertex=False
 
 #========================================LOKI FUBNCTOR VARIABLES========================================
 
-tuple.addBranches({'Kstar' : '[B0 -> ^(K*(892)0 -> K+ pi-) (eta_prime -> pi- pi+ gamma)]CC',
-                   'eta_prime' : '[B0 -> (K*(892)0 -> K+ pi-) ^(eta_prime -> pi- pi+ gamma)]CC',
-                   'Kplus' : '[B0 -> (K*(892)0 -> ^K+ pi-) (eta_prime -> pi- pi+ gamma)]CC',
-                   'piminus' : '[B0 -> (K*(892)0 -> K+ ^pi-) (eta_prime -> pi- pi+ gamma)]CC',
-                   'piplus' : '[B0 -> (K*(892)0 -> K+ pi-) (eta_prime -> pi- ^pi+ gamma)]CC',
-                   'piminus0' : '[B0 -> (K*(892)0 -> K+ pi-) (eta_prime -> ^pi- pi+ gamma)]CC',
-                   'gamma' : '[B0 -> (K*(892)0 -> K+ pi-) (eta_prime -> pi- pi+ ^gamma)]CC'})
+tuple.addBranches({'Kstar' : '[B0 -> ^(K*(892)0 -> K+ pi-) (eta -> pi- pi+ (pi0 -> gamma gamma))]CC',
+                   'eta' : '[B0 -> (K*(892)0 -> K+ pi-) ^(eta -> pi- pi+ (pi0 -> gamma gamma))]CC',
+                   'Kplus' : '[B0 -> (K*(892)0 -> ^K+ pi-) (eta -> pi- pi+ (pi0 -> gamma gamma))]CC',
+                   'piminus' : '[B0 -> (K*(892)0 -> K+ ^pi-) (eta -> pi- pi+ (pi0 -> gamma gamma))]CC',
+                   'piplus' : '[B0 -> (K*(892)0 -> K+ pi-) (eta -> pi- ^pi+ (pi0 -> gamma gamma))]CC',
+                   'piminus0' : '[B0 -> (K*(892)0 -> K+ pi-) (eta -> ^pi- pi+ (pi0 -> gamma gamma))]CC',
+                   'gamma' : '[B0 -> (K*(892)0 -> K+ pi-) (eta -> pi- pi+ (pi0 -> ^gamma gamma))]CC',
+                   'gamma0' : '[B0 -> (K*(892)0 -> K+ pi-) (eta -> pi- pi+ (pi0 -> gamma ^gamma))]CC',
+                   'pi0' : '[B0 -> (K*(892)0 -> K+ pi-) (eta -> pi- pi+ ^(pi0 -> gamma gamma))]CC'})
 
 
 from LoKiPhys.decorators import MAXTREE,MINTREE,ISBASIC,HASTRACK,SUMTREE,PT,ABSID,NINTREE,ETA,TRPCHI2
 B0_hybrid=tuple.B0.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_B0')
 Kstar_hybrid=tuple.Kstar.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_Kstar')
-eta_prime_hybrid=tuple.eta_prime.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_eta_prime')
+eta_hybrid=tuple.eta.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_eta')
 Kplus_hybrid=tuple.Kplus.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_Kplus')
 piminus_hybrid=tuple.piminus.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_piminus')
 piplus_hybrid=tuple.piplus.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_piplus')
 piminus0_hybrid=tuple.piminus0.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_piminus0')
 gamma_hybrid=tuple.gamma.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_gamma')
+gamma0_hybrid=tuple.gamma0.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_gamma0')
+pi0_hybrid=tuple.pi0.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_pi0')
 
 preamble=[
     'TRACK_MAX_PT= MAXTREE(PT, ISBASIC & HASTRACK, -666)',
@@ -156,7 +160,7 @@ Kstar_hybrid.Variables ={
     'eta': 'ETA'
  }
 
-eta_prime_hybrid.Variables ={
+eta_hybrid.Variables ={
     'branch_mass':'MM',
     'eta': 'ETA'
     }
@@ -178,6 +182,12 @@ piminus0_hybrid.Variables ={
     }
 
 gamma_hybrid.Variables = {
+    'eta':'ETA'
+    }
+gamma0_hybrid.Variables = {
+    'eta':'ETA'
+    }
+pi0_hybrid.Variables = {
     'eta':'ETA'
     }
 
@@ -221,7 +231,7 @@ from Configurables import MCDecayTreeTuple
 mctuple=MCDecayTreeTuple("mctuple")
 mctuple.ToolList+=["MCTupleToolKinematic","MCTupleToolReconstructed","MCTupleToolHierarchy","MCTupleToolDecayType","MCTupleToolPID"]
 
-mctuple.Decay="[B0 -> ^(K*(892)0 -> ^K+ ^pi-) ^(eta_prime -> ^rho(770)0 ^gamma)]CC"
+mctuple.Decay="[B0 -> ^(K*(892)0 -> ^K+ ^pi-) ^(eta -> ^pi+ ^pi- ^(pi0-> ^gamma ^gamma))]CC"
 
 MySequencer.Members.append(etuple)
 MySequencer.Members.append(tuple)
@@ -239,10 +249,10 @@ DaVinci().Simulation=simulation
 
 
 
-#from GaudiConf import IOHelper
+from GaudiConf import IOHelper
 
 # Use the local input data
-#IOHelper().inputFiles([
- #   './00038839_00000002_2.AllStreams.dst'
-#], clear=True)
+IOHelper().inputFiles([
+    './00038839_00000002_2.AllStreams.dst'
+], clear=True)
 

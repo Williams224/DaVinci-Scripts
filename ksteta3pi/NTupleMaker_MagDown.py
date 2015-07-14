@@ -249,10 +249,10 @@ DaVinci().Simulation=simulation
 
 
 
-#from GaudiConf import IOHelper
+from GaudiConf import IOHelper
 
 # Use the local input data
-#IOHelper().inputFiles([
- #   './00038839_00000002_2.AllStreams.dst'
-#], clear=True)
+IOHelper().inputFiles([
+    './00038839_00000002_2.AllStreams.dst'
+], clear=True)
 
