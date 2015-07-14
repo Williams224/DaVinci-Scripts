@@ -5,7 +5,7 @@ from Configurables import GaudiSequencer
 MySequencer = GaudiSequencer('Sequence')
 #For 2012 MC
 DaVinci.DDDBtag='dddb-20130929-1'
-DaVinci.CondDBtag='sim-20130522-1-vc-mu100'
+DaVinci.CondDBtag='sim-20130522-1-vc-md100'
 
 #for 2011 MC
 #DaVinci.DDDBtag='dddb-20130929'
@@ -13,21 +13,20 @@ DaVinci.CondDBtag='sim-20130522-1-vc-mu100'
 
 simulation=True
 
-#only for mdst
-#from Configurables import EventNodeKiller
-#eventNodeKiller = EventNodeKiller('DAQkiller')
-#eventNodeKiller.Nodes = ['DAQ','pRec']
-#MySequencer.Members+=[eventNodeKiller]   
 
 
 #################################################################
 #Rerun with stripping21 applied
 
 if simulation:
+    from Configurables import EventNodeKiller
     from StrippingConf.Configuration import StrippingConf, StrippingStream
     from StrippingSettings.Utils import strippingConfiguration
     from StrippingArchive.Utils import buildStreams
     from StrippingArchive import strippingArchive
+
+    event_node_killer=EventNodeKiller('StripKiller')
+    event_node_killer.Nodes=['Event/AllStreams','/Event/Strip']
 
     from Configurables import PhysConf
     PhysConf().CaloReProcessing=True
@@ -38,7 +37,7 @@ if simulation:
     streams=buildStreams(stripping=config,archive=archive)
 
     MyStream= StrippingStream("MyStream")
-    MyLines= ["StrippingB2XEtaB2eta3piKstarLine"]
+    MyLines= ["StrippingB2XEtaB2etapKstarLine"]
 
     for stream in streams:
         for line in stream.lines:
@@ -53,7 +52,7 @@ if simulation:
                       AcceptBadEvents = False,
                       BadEventSelection = filterBadEvents)
 
-    DaVinci().appendToMainSequence([sc.sequence()])
+    DaVinci().appendToMainSequence([event_node_killer,sc.sequence()])
     
 
             
@@ -61,10 +60,13 @@ if simulation:
 from Configurables import DecayTreeTuple
 from Configurables import TupleToolL0Calo
 from DecayTreeTuple.Configuration import *
+
+line = 'B2XEtaB2etapKstarLine'
+
 tuple=DecayTreeTuple()
-tuple.Decay="[B0 -> ^(K*(892)0 -> ^K+ ^pi-) ^(eta -> ^pi- ^pi+ ^(pi0 -> ^gamma ^gamma))]CC"
-tuple.Branches={"B0":"[B0 -> (K*(892)0 -> K+ pi-) (eta -> pi- pi+ (pi0 -> gamma gamma))]CC"}
-tuple.Inputs=["Phys/B2XEtaB2eta3piKstarLine/Particles"]
+tuple.Decay="[B0 -> ^(K*(892)0 -> ^K+ ^pi-) ^(eta_prime -> ^pi- ^pi+ ^gamma)]CC"
+tuple.Branches={"B0":"[B0 -> (K*(892)0 -> K+ pi-) (eta_prime -> pi- pi+ gamma)]CC"}
+tuple.Inputs=['/Event/Phys/{0}/Particles'.format(line)]
 tuple.addTool(TupleToolL0Calo())
 tuple.TupleToolL0Calo.TriggerClusterLocation="/Event/Trig/L0/Calo"
 tuple.TupleToolL0Calo.WhichCalo="HCAL"
@@ -85,34 +87,102 @@ tuple.ToolList += [
     , "TupleToolPhotonInfo"
     , "TupleToolMCTruth"
     , "TupleToolMCBackgroundInfo"
-   # , "MCTupleTOolHierachy"
     , "TupleToolCaloHypo"
     , "TupleToolTrackIsolation"
-    #, "TupleToolTagging" not used in microdst
     ]
 
-#from Configurables import TupleToolMCTruth
-#from TupleToolMCTruth.Configuration import *
 
-#tuple.addTool(TupleToolMCTruth,name="TruthM")
-#tuple.ToolList+= [ "TupleToolMCTruth/TruthM"]
-#tuple.TruthM.ToolList = ["MCTupleToolHierachy/Hierachy"]
-#tuple.TruthM.addTool(MCTupleToolHierachy,name="Hierachy")
-#tuple.TupleToolMCTruth.addTool(MCTupleToolKinematic,name="MCTupleToolKinematic")
-#tuple.TupleToolMCTruth.addTool(MCTupleToolHierachy,name="MCTupleToolHierachy")
-#tuple.TupleToolMCTruth.addTool(MCTupleToolPID,name="MCTupleToolPID")
-
-
-#####Look at adding branchesss##############
 tuple.addTool(TupleToolDecay,name="B0")
 
 from Configurables import TupleToolDecayTreeFitter
 
-tuple.B0.addTool(TupleToolDecayTreeFitter("PVFit"))
+#========================================REFIT WITH DAUGHTERS AND PV CONSTRAINED==============================
+tuple.B0.addTupleTool('TupleToolDecayTreeFitter/PVFit')
 tuple.B0.PVFit.Verbose=True
 tuple.B0.PVFit.constrainToOriginVertex=True
-tuple.B0.PVFit.daughtersToConstrain = ["K*(892)0","eta"]
-tuple.B0.ToolList+=["TupleToolDecayTreeFitter/PVFit"]
+tuple.B0.PVFit.daughtersToConstrain = ["K*(892)0","eta_prime"]
+
+#========================================REFIT WITH JUST DAUGHTERS CONSTRAINED================================
+tuple.B0.addTupleTool('TupleToolDecayTreeFitter/Conskstar_etap')
+tuple.B0.Conskstar_etap.Verbose=True
+tuple.B0.Conskstar_etap.constrainToOriginVertex=False
+tuple.B0.Conskstar_etap.daughtersToConstrain = ["K*(892)0","eta_prime"]
+
+#========================================REFIT WITH NOTHING CONSTRAINED========================================
+tuple.B0.addTupleTool('TupleToolDecayTreeFitter/Consnothing')
+tuple.B0.Consnothing.Verbose=True
+tuple.B0.Consnothing.constrainToOriginVertex=False
+
+#========================================LOKI FUBNCTOR VARIABLES========================================
+
+tuple.addBranches({'Kstar' : '[B0 -> ^(K*(892)0 -> K+ pi-) (eta_prime -> pi- pi+ gamma)]CC',
+                   'eta_prime' : '[B0 -> (K*(892)0 -> K+ pi-) ^(eta_prime -> pi- pi+ gamma)]CC',
+                   'Kplus' : '[B0 -> (K*(892)0 -> ^K+ pi-) (eta_prime -> pi- pi+ gamma)]CC',
+                   'piminus' : '[B0 -> (K*(892)0 -> K+ ^pi-) (eta_prime -> pi- pi+ gamma)]CC',
+                   'piplus' : '[B0 -> (K*(892)0 -> K+ pi-) (eta_prime -> pi- ^pi+ gamma)]CC',
+                   'piminus0' : '[B0 -> (K*(892)0 -> K+ pi-) (eta_prime -> ^pi- pi+ gamma)]CC',
+                   'gamma' : '[B0 -> (K*(892)0 -> K+ pi-) (eta_prime -> pi- pi+ ^gamma)]CC'})
+
+
+from LoKiPhys.decorators import MAXTREE,MINTREE,ISBASIC,HASTRACK,SUMTREE,PT,ABSID,NINTREE,ETA,TRPCHI2
+B0_hybrid=tuple.B0.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_B0')
+Kstar_hybrid=tuple.Kstar.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_Kstar')
+eta_prime_hybrid=tuple.eta_prime.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_eta_prime')
+Kplus_hybrid=tuple.Kplus.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_Kplus')
+piminus_hybrid=tuple.piminus.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_piminus')
+piplus_hybrid=tuple.piplus.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_piplus')
+piminus0_hybrid=tuple.piminus0.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_piminus0')
+gamma_hybrid=tuple.gamma.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_gamma')
+
+preamble=[
+    'TRACK_MAX_PT= MAXTREE(PT, ISBASIC & HASTRACK, -666)',
+    'TRACK_MIN_PT= MINTREE(PT, ISBASIC & HASTRACK)',
+    'SUMTRACK_PT= SUMTREE((211 == ABSID)|(-211 == ABSID)|(321 == ABSID)|(-321 == ABSID),PT)',
+    'SUM_PCHI2= SUMTREE((211 == ABSID)|(-211 == ABSID)|(321 == ABSID)|(-321 == ABSID),TRPCHI2)'
+    ]
+B0_hybrid.Preambulo=preamble
+
+B0_hybrid.Variables = {
+    'max_pt_track' : 'TRACK_MAX_PT',
+    'min_pt_track' : 'TRACK_MIN_PT',
+    'sum_track_pt' : 'SUMTRACK_PT',
+    'sum_pchi2' : 'SUM_PCHI2',
+    'n_highpt_tracks' : 'NINTREE(ISBASIC & HASTRACK & (PT>250.0*MeV))',
+    'eta' :'ETA'
+    }
+
+Kstar_hybrid.Variables ={
+    'branch_mass':'MM',
+    'eta': 'ETA'
+ }
+
+eta_prime_hybrid.Variables ={
+    'branch_mass':'MM',
+    'eta': 'ETA'
+    }
+
+Kplus_hybrid.Variables ={
+    'eta': 'ETA'
+    }
+
+piminus_hybrid.Variables ={
+    'eta': 'ETA'
+    }
+
+piplus_hybrid.Variables ={
+    'eta': 'ETA'
+    }
+
+piminus0_hybrid.Variables ={
+    'eta': 'ETA'
+    }
+
+gamma_hybrid.Variables = {
+    'eta':'ETA'
+    }
+
+#==============================TRIGGER DECISIONS==============================-
+
                  
 
 from Configurables import TupleToolTISTOS
@@ -151,7 +221,7 @@ from Configurables import MCDecayTreeTuple
 mctuple=MCDecayTreeTuple("mctuple")
 mctuple.ToolList+=["MCTupleToolKinematic","MCTupleToolReconstructed","MCTupleToolHierarchy","MCTupleToolDecayType","MCTupleToolPID"]
 
-mctuple.Decay="[B0 -> ^(K*(892)0 -> ^K+ ^pi-) ^(eta -> ^pi- ^pi+ ^(pi0 -> ^gamma ^gamma))]CC"
+mctuple.Decay="[B0 -> ^(K*(892)0 -> ^K+ ^pi-) ^(eta_prime -> ^rho(770)0 ^gamma)]CC"
 
 MySequencer.Members.append(etuple)
 MySequencer.Members.append(tuple)
@@ -169,7 +239,10 @@ DaVinci().Simulation=simulation
 
 
 
+#from GaudiConf import IOHelper
 
-
-
+# Use the local input data
+#IOHelper().inputFiles([
+ #   './00038839_00000002_2.AllStreams.dst'
+#], clear=True)
 
