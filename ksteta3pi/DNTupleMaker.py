@@ -10,8 +10,8 @@ line='B2XEtaB2eta3piKstarLine'
 from Configurables import DecayTreeTuple
 from DecayTreeTuple.Configuration import *
 tuple=DecayTreeTuple()
-tuple.Decay="[B0 -> ^(K*(892)0 -> ^K+ ^pi-) ^(eta -> ^pi- ^pi+ ^(pi0 -> ^gamma ^gamma)]CC"
-tuple.Branches={"B0":"[B0 -> (K*(892)0 -> K+ pi-) (eta -> pi- pi+ ^(pi0 ->^gamma ^gamma)]CC"}
+tuple.Decay="[B0 -> ^(K*(892)0 -> ^K+ ^pi-) ^(eta -> ^pi- ^pi+ ^(pi0 -> ^gamma ^gamma))]CC"
+tuple.Branches={"B0":"[B0 -> (K*(892)0 -> K+ pi-) (eta -> pi- pi+ ^(pi0 ->^gamma ^gamma))]CC"}
 tuple.Inputs=['Phys/{0}/Particles'.format(line)]
 
 tuple.ToolList += [
@@ -26,7 +26,6 @@ tuple.ToolList += [
     , "TupleToolTrackInfo"
     , "TupleToolVtxIsoln"
     , "TupleToolPhotonInfo"
-    , "TupleToolPi0"
     #, "TupleToolMCTruth"
     #, "TupleToolMCBackgroundInfo"
     , "TupleToolCaloHypo"
@@ -45,9 +44,9 @@ tuple.B0.PVFit.daughtersToConstrain = ["K*(892)0","eta"]
 
 #========================================REFIT WITH JUST DAUGHTERS CONSTRAINED================================
 tuple.B0.addTupleTool('TupleToolDecayTreeFitter/Conskstar_eta')
-tuple.B0.Conskstar_etap.Verbose=True
-tuple.B0.Conskstar_etap.constrainToOriginVertex=False
-tuple.B0.Conskstar_etap.daughtersToConstrain = ["K*(892)0","eta"]
+tuple.B0.Conskstar_eta.Verbose=True
+tuple.B0.Conskstar_eta.constrainToOriginVertex=False
+tuple.B0.Conskstar_eta.daughtersToConstrain = ["K*(892)0","eta"]
 
 #========================================REFIT WITH NOTHING CONSTRAINED========================================
 tuple.B0.addTupleTool('TupleToolDecayTreeFitter/Consnothing')
