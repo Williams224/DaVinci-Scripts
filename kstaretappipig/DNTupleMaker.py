@@ -37,15 +37,15 @@ tuple.addTool(TupleToolDecay,name="B0")
 from Configurables import TupleToolDecayTreeFitter
 
 #===========================REFIT WITH DAUGHTERS AND PV CONSTRAINED======================
+tuple.B0.addTupleTool('TupleToolDecayTreeFitter/ConsAll')
+tuple.B0.ConsAll.Verbose=True
+tuple.B0.ConsAll.constrainToOriginVertex=True
+tuple.B0.ConsAll.daughtersToConstrain = ["K*(892)0","eta_prime"]
+#==============================REFIT WITH ONLY ETA AND PV CONTRAINED==============================
 tuple.B0.addTupleTool('TupleToolDecayTreeFitter/PVFit')
 tuple.B0.PVFit.Verbose=True
 tuple.B0.PVFit.constrainToOriginVertex=True
-tuple.B0.PVFit.daughtersToConstrain = ["K*(892)0","eta_prime"]
-#==============================REFIT WITH ONLY ETA AND PV CONTRAINED==============================
-tuple.B0.addTupleTool('TupleToolDecayTreeFitter/EtapOnly')
-tuple.B0.EtapOnly.Verbose=True
-tuple.B0.EtapOnly.constrainToOriginVertex=True
-tuple.B0.EtapOnly.daughtersToConstrain = ["eta_prime"]
+tuple.B0.PVFit.daughtersToConstrain = ["eta_prime"]
 #==============================REFIT WITH ONLY K* CONSTRAINED===================================
 tuple.B0.addTupleTool('TupleToolDecayTreeFitter/KStarOnly')
 tuple.B0.KStarOnly.Verbose=True
