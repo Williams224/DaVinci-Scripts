@@ -185,9 +185,21 @@ tistos.TriggerList=["L0PhotonDecision",
                     "Hlt2Topo4BodySimpleDecision"]
 from Configurables import TupleToolL0Calo
 
-tuple.B0.addTool(TupleToolL0Calo,name="B0L0Calo")
-tuple.B0.ToolList += ["TupleToolL0Calo/B0L0Calo"]
-tuple.B0.B0L0Calo.WhichCalo="HCAL"
+tuple.Kplus.addTool(TupleToolL0Calo,name="KplusL0Calo")
+tuple.Kplus.ToolList += ["TupleToolL0Calo/KplusL0Calo"]
+tuple.Kplus.KplusL0Calo.WhichCalo="HCAL"
+
+tuple.piplus.addTool(TupleToolL0Calo,name="piplusL0Calo")
+tuple.piplus.ToolList += ["TupleToolL0Calo/piplusL0Calo"]
+tuple.piplus.piplusL0Calo.WhichCalo="HCAL"
+
+tuple.piminus.addTool(TupleToolL0Calo,name="piminusL0Calo")
+tuple.piminus.ToolList += ["TupleToolL0Calo/piminusL0Calo"]
+tuple.piminus.piminusL0Calo.WhichCalo="HCAL"
+
+tuple.piminus0.addTool(TupleToolL0Calo,name="piminus0L0Calo")
+tuple.piminus0.ToolList += ["TupleToolL0Calo/piminus0L0Calo"]
+tuple.piminus0.piminus0L0Calo.WhichCalo="HCAL"
 
 
 
