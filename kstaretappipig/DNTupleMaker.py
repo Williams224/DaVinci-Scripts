@@ -43,18 +43,18 @@ tuple.B0.PVFit.constrainToOriginVertex=True
 tuple.B0.PVFit.daughtersToConstrain = ["K*(892)0","eta_prime"]
 #==============================REFIT WITH ONLY ETA AND PV CONTRAINED==============================
 tuple.B0.addTupleTool('TupleToolDecayTreeFitter/EtapOnly')
-tuple.B0.PVFit.Verbose=True
-tuple.B0.PVFit.constrainToOriginVertex=True
-tuple.B0.PVFit.daughtersToConstrain = ["eta_prime"]
+tuple.B0.EtapOnly.Verbose=True
+tuple.B0.EtapOnly.constrainToOriginVertex=True
+tuple.B0.EtapOnly.daughtersToConstrain = ["eta_prime"]
 #==============================REFIT WITH ONLY K* CONSTRAINED===================================
 tuple.B0.addTupleTool('TupleToolDecayTreeFitter/KStarOnly')
-tuple.B0.PVFit.Verbose=True
-tuple.B0.PVFit.constrainToOriginVertex=True
-tuple.B0.PVFit.daughtersToConstrain = ["K*(892)0"]
+tuple.B0.KStarOnly.Verbose=True
+tuple.B0.KStarOnly.constrainToOriginVertex=True
+tuple.B0.KStarOnly.daughtersToConstrain = ["K*(892)0"]
 #==============================REFIT WITH ONLY  PV CONTRAINED==============================
 tuple.B0.addTupleTool('TupleToolDecayTreeFitter/PVOnly')
-tuple.B0.PVFit.Verbose=True
-tuple.B0.PVFit.constrainToOriginVertex=True
+tuple.B0.PVOnly.Verbose=True
+tuple.B0.PVOnly.constrainToOriginVertex=True
 #========================================REFIT WITH JUST DAUGHTERS CONSTRAINED================================
 tuple.B0.addTupleTool('TupleToolDecayTreeFitter/Conskstar_etap')
 tuple.B0.Conskstar_etap.Verbose=True
