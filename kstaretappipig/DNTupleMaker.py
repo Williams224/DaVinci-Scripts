@@ -41,7 +41,20 @@ tuple.B0.addTupleTool('TupleToolDecayTreeFitter/PVFit')
 tuple.B0.PVFit.Verbose=True
 tuple.B0.PVFit.constrainToOriginVertex=True
 tuple.B0.PVFit.daughtersToConstrain = ["K*(892)0","eta_prime"]
-
+#==============================REFIT WITH ONLY ETA AND PV CONTRAINED==============================
+tuple.B0.addTupleTool('TupleToolDecayTreeFitter/EtapOnly')
+tuple.B0.PVFit.Verbose=True
+tuple.B0.PVFit.constrainToOriginVertex=True
+tuple.B0.PVFit.daughtersToConstrain = ["eta_prime"]
+#==============================REFIT WITH ONLY K* CONSTRAINED===================================
+tuple.B0.addTupleTool('TupleToolDecayTreeFitter/KStarOnly')
+tuple.B0.PVFit.Verbose=True
+tuple.B0.PVFit.constrainToOriginVertex=True
+tuple.B0.PVFit.daughtersToConstrain = ["K*(892)0"]
+#==============================REFIT WITH ONLY  PV CONTRAINED==============================
+tuple.B0.addTupleTool('TupleToolDecayTreeFitter/PVOnly')
+tuple.B0.PVFit.Verbose=True
+tuple.B0.PVFit.constrainToOriginVertex=True
 #========================================REFIT WITH JUST DAUGHTERS CONSTRAINED================================
 tuple.B0.addTupleTool('TupleToolDecayTreeFitter/Conskstar_etap')
 tuple.B0.Conskstar_etap.Verbose=True
@@ -170,6 +183,12 @@ tistos.TriggerList=["L0PhotonDecision",
                     "Hlt2Topo2BodySimpleDecision",
                     "Hlt2Topo3BodySimpleDecision",
                     "Hlt2Topo4BodySimpleDecision"]
+from Configurables import TupleToolL0Calo
+
+tuple.B0.addTool(TupleToolL0Calo,name="B0L0Calo")
+tuple.B0.ToolList += ["TupleToolL0Calo/B0L0Calo"]
+tuple.B0.B0L0Calo.WhichCalo="HCAL"
+
 
 
 DaVinci().InputType='MDST'
