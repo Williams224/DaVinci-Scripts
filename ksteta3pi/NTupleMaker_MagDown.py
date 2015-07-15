@@ -65,7 +65,7 @@ line = 'B2XEtaB2eta3piKstarLine'
 
 tuple=DecayTreeTuple()
 tuple.Decay="[B0 -> ^(K*(892)0 -> ^K+ ^pi-) ^(eta -> ^pi- ^pi+ ^(pi0 -> ^gamma ^gamma))]CC"
-tuple.Branches={"B0":"[B0 -> (K*(892)0 -> K+ pi-) (eta -> pi- pi+ (pi0 -> ^gamma ^gamma))]CC"}
+tuple.Branches={"B0":"[B0 -> (K*(892)0 -> K+ pi-) (eta -> pi- pi+ (pi0 -> gamma gamma))]CC"}
 tuple.Inputs=['/Event/Phys/{0}/Particles'.format(line)]
 tuple.addTool(TupleToolL0Calo())
 tuple.TupleToolL0Calo.TriggerClusterLocation="/Event/Trig/L0/Calo"
@@ -97,11 +97,24 @@ tuple.addTool(TupleToolDecay,name="B0")
 from Configurables import TupleToolDecayTreeFitter
 
 #========================================REFIT WITH DAUGHTERS AND PV CONSTRAINED==============================
+tuple.B0.addTupleTool('TupleToolDecayTreeFitter/ConsAll')
+tuple.B0.ConsAll.Verbose=True
+tuple.B0.ConsAll.constrainToOriginVertex=True
+tuple.B0.ConsAll.daughtersToConstrain = ["K*(892)0","eta"]
+#==============================REFIT WITH ONLY ETA AND PV CONTRAINED==============================
 tuple.B0.addTupleTool('TupleToolDecayTreeFitter/PVFit')
 tuple.B0.PVFit.Verbose=True
 tuple.B0.PVFit.constrainToOriginVertex=True
-tuple.B0.PVFit.daughtersToConstrain = ["K*(892)0","eta"]
-
+tuple.B0.PVFit.daughtersToConstrain = ["eta"]
+#==============================REFIT WITH ONLY K* CONSTRAINED===================================
+tuple.B0.addTupleTool('TupleToolDecayTreeFitter/KStarOnly')
+tuple.B0.KStarOnly.Verbose=True
+tuple.B0.KStarOnly.constrainToOriginVertex=True
+tuple.B0.KStarOnly.daughtersToConstrain = ["K*(892)0"]
+#==============================REFIT WITH ONLY  PV CONTRAINED==============================
+tuple.B0.addTupleTool('TupleToolDecayTreeFitter/PVOnly')
+tuple.B0.PVOnly.Verbose=True
+tuple.B0.PVOnly.constrainToOriginVertex=True
 #========================================REFIT WITH JUST DAUGHTERS CONSTRAINED================================
 tuple.B0.addTupleTool('TupleToolDecayTreeFitter/Conskstar_eta')
 tuple.B0.Conskstar_eta.Verbose=True
@@ -223,6 +236,27 @@ tistos.TriggerList=["L0PhotonDecision",
                     "Hlt2Topo3BodySimpleDecision",
                     "Hlt2Topo4BodySimpleDecision"]
 
+
+from Configurables import TupleToolL0Calo
+
+tuple.Kplus.addTool(TupleToolL0Calo,name="KplusL0Calo")
+tuple.Kplus.ToolList += ["TupleToolL0Calo/KplusL0Calo"]
+tuple.Kplus.KplusL0Calo.WhichCalo="HCAL"
+
+tuple.piplus.addTool(TupleToolL0Calo,name="piplusL0Calo")
+tuple.piplus.ToolList += ["TupleToolL0Calo/piplusL0Calo"]
+tuple.piplus.piplusL0Calo.WhichCalo="HCAL"
+
+tuple.piminus.addTool(TupleToolL0Calo,name="piminusL0Calo")
+tuple.piminus.ToolList += ["TupleToolL0Calo/piminusL0Calo"]
+tuple.piminus.piminusL0Calo.WhichCalo="HCAL"
+
+tuple.piminus0.addTool(TupleToolL0Calo,name="piminus0L0Calo")
+tuple.piminus0.ToolList += ["TupleToolL0Calo/piminus0L0Calo"]
+tuple.piminus0.piminus0L0Calo.WhichCalo="HCAL"
+
+
+
 etuple=EventTuple()
 etuple.ToolList=["TupleToolEventInfo"]
 
@@ -231,7 +265,7 @@ from Configurables import MCDecayTreeTuple
 mctuple=MCDecayTreeTuple("mctuple")
 mctuple.ToolList+=["MCTupleToolKinematic","MCTupleToolReconstructed","MCTupleToolHierarchy","MCTupleToolDecayType","MCTupleToolPID"]
 
-mctuple.Decay="[B0 -> ^(K*(892)0 -> ^K+ ^pi-) ^(eta -> ^pi+ ^pi- ^(pi0-> ^gamma ^gamma))]CC"
+mctuple.Decay="[B0 -> ^(K*(892)0 -> ^K+ ^pi-) ^(eta -> ^pi- ^pi+ ^(pi0-> ^gamma ^gamma))]CC"
 
 MySequencer.Members.append(etuple)
 MySequencer.Members.append(tuple)
@@ -249,10 +283,10 @@ DaVinci().Simulation=simulation
 
 
 
-from GaudiConf import IOHelper
+#from GaudiConf import IOHelper
 
 # Use the local input data
-IOHelper().inputFiles([
-    './00038839_00000002_2.AllStreams.dst'
-], clear=True)
+#IOHelper().inputFiles([
+ #   '00038851_00000006_2.AllStreams.dst'
+#], clear=True)
 
