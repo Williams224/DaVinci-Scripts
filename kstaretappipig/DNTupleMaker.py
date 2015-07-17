@@ -37,11 +37,24 @@ tuple.addTool(TupleToolDecay,name="B0")
 from Configurables import TupleToolDecayTreeFitter
 
 #===========================REFIT WITH DAUGHTERS AND PV CONSTRAINED======================
+tuple.B0.addTupleTool('TupleToolDecayTreeFitter/ConsAll')
+tuple.B0.ConsAll.Verbose=True
+tuple.B0.ConsAll.constrainToOriginVertex=True
+tuple.B0.ConsAll.daughtersToConstrain = ["K*(892)0","eta_prime"]
+#==============================REFIT WITH ONLY ETA AND PV CONTRAINED==============================
 tuple.B0.addTupleTool('TupleToolDecayTreeFitter/PVFit')
 tuple.B0.PVFit.Verbose=True
 tuple.B0.PVFit.constrainToOriginVertex=True
-tuple.B0.PVFit.daughtersToConstrain = ["K*(892)0","eta_prime"]
-
+tuple.B0.PVFit.daughtersToConstrain = ["eta_prime"]
+#==============================REFIT WITH ONLY K* CONSTRAINED===================================
+tuple.B0.addTupleTool('TupleToolDecayTreeFitter/KStarOnly')
+tuple.B0.KStarOnly.Verbose=True
+tuple.B0.KStarOnly.constrainToOriginVertex=True
+tuple.B0.KStarOnly.daughtersToConstrain = ["K*(892)0"]
+#==============================REFIT WITH ONLY  PV CONTRAINED==============================
+tuple.B0.addTupleTool('TupleToolDecayTreeFitter/PVOnly')
+tuple.B0.PVOnly.Verbose=True
+tuple.B0.PVOnly.constrainToOriginVertex=True
 #========================================REFIT WITH JUST DAUGHTERS CONSTRAINED================================
 tuple.B0.addTupleTool('TupleToolDecayTreeFitter/Conskstar_etap')
 tuple.B0.Conskstar_etap.Verbose=True
@@ -119,6 +132,25 @@ piminus0_hybrid.Variables ={
 gamma_hybrid.Variables = {
     'eta':'ETA'
     }
+#==============================MassSubs=====================================
+from Configurables import TupleToolSubMass
+
+tuple.B0.addTool(TupleToolSubMass)
+tuple.B0.ToolList += ["TupleToolSubMass"]
+tuple.B0.TupleToolSubMass.Substitution += ["pi- => K-"]
+tuple.B0.TupleToolSubMass.Substitution += ["K+ => pi+"]
+tuple.B0.TupleToolSubMass.Substitution += ["pi+ => K+"]
+tuple.B0.TupleToolSubMass.Substitution += ["pi+ => p+"]
+tuple.B0.TupleToolSubMass.Substitution += ["pi- => p~-"]
+tuple.B0.TupleToolSubMass.Substitution += ["K+ => p+"]
+tuple.B0.TupleToolSubMass.Substitution += ["gamma => pi0"]
+tuple.B0.TupleToolSubMass.Substitution += ["gamma => e-"]
+tuple.B0.TupleToolSubMass.Substitution += ["gamma => e+"]
+tuple.B0.TupleToolSubMass.Substitution += ["pi- => mu-"]
+tuple.B0.TupleToolSubMass.Substitution += ["pi+ => mu+"]
+tuple.B0.TupleToolSubMass.DoubleSubstitution += ["K+/pi- => pi+/K-"]
+tuple.B0.TupleToolSubMass.DoubleSubstitution += ["pi+/pi- => pi-/pi+"]
+tuple.B0.TupleToolSubMass.DoubleSubstitution += ["pi+/pi- => mu+/mu-"]
 
 
 #==============================TRIGGER DECISIONS==============================
@@ -152,6 +184,25 @@ tistos.TriggerList=["L0PhotonDecision",
                     "Hlt2Topo3BodySimpleDecision",
                     "Hlt2Topo4BodySimpleDecision"]
 
+from Configurables import TupleToolL0Calo
+
+tuple.Kplus.addTool(TupleToolL0Calo,name="KplusL0Calo")
+tuple.Kplus.ToolList += ["TupleToolL0Calo/KplusL0Calo"]
+tuple.Kplus.KplusL0Calo.WhichCalo="HCAL"
+
+tuple.piplus.addTool(TupleToolL0Calo,name="piplusL0Calo")
+tuple.piplus.ToolList += ["TupleToolL0Calo/piplusL0Calo"]
+tuple.piplus.piplusL0Calo.WhichCalo="HCAL"
+
+tuple.piminus.addTool(TupleToolL0Calo,name="piminusL0Calo")
+tuple.piminus.ToolList += ["TupleToolL0Calo/piminusL0Calo"]
+tuple.piminus.piminusL0Calo.WhichCalo="HCAL"
+
+tuple.piminus0.addTool(TupleToolL0Calo,name="piminus0L0Calo")
+tuple.piminus0.ToolList += ["TupleToolL0Calo/piminus0L0Calo"]
+tuple.piminus0.piminus0L0Calo.WhichCalo="HCAL"
+
+
 
 DaVinci().InputType='MDST'
 DaVinci().RootInTES='/Event/{0}'.format(stream)
@@ -166,12 +217,12 @@ DaVinci().MoniSequence=[tuple]
 DaVinci().Simulation=False
 
 
-#from GaudiConf import IOHelper
+from GaudiConf import IOHelper
 
 # Use the local input data
-#IOHelper().inputFiles([
- #       './00041836_00000057_1.bhadron.mdst'
-  #      ], clear=True)
+IOHelper().inputFiles([
+        './00041836_00000057_1.bhadron.mdst'
+        ], clear=True)
 
 
 

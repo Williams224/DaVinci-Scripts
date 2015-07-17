@@ -81,6 +81,11 @@ tuple.ToolList += [
     , "TupleToolKinematic"
     , "TupleToolPropertime"
     , "TupleToolPrimaries"
+    , "TupleToolJets"
+    , "TupleToolJetRelations"
+#    , "TupleToolJetsForB"
+#    , "TupleToolJetTag"
+ #   , "TupleToolWZJets"
     , "TupleToolEventInfo"
     , "TupleToolTrackInfo"
     , "TupleToolVtxIsoln"
@@ -89,6 +94,7 @@ tuple.ToolList += [
     , "TupleToolMCBackgroundInfo"
     , "TupleToolCaloHypo"
     , "TupleToolTrackIsolation"
+#    , "TupleToolP2VV"
     ]
 
 
@@ -232,17 +238,17 @@ DaVinci().UserAlgorithms+=[MySequencer]
 DaVinci().TupleFile="Output.root"
 DaVinci().HistogramFile="histos.root"
 DaVinci().DataType='2012'
-DaVinci().EvtMax=-1
+DaVinci().EvtMax=1000
 DaVinci().PrintFreq=1000
 DaVinci().MoniSequence=[tuple]
 DaVinci().Simulation=simulation
 
 
 
-#from GaudiConf import IOHelper
+from GaudiConf import IOHelper
 
 # Use the local input data
-#IOHelper().inputFiles([
- #   './00038839_00000002_2.AllStreams.dst'
-#], clear=True)
+IOHelper().inputFiles([
+   './00038839_00000002_2.AllStreams.dst'
+], clear=True)
 

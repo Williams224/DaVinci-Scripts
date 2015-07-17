@@ -1,27 +1,27 @@
 from Gaudi.Configuration import *
 from Configurables import DaVinci
 from Configurables import GaudiSequencer
-
+from Configurables import DecayTreeTuple
+from DecayTreeTuple.Configuration import *
 simulation=False
 
 stream='Bhadron'
 line='B2XEtaB2etapKstarLine'
 
 # configure an algorithm to substitute particles
+from PhysSelPython.Wrappers import Selection
+from PhysSelPython.Wrappers import SelectionSequence
+from PhysSelPython.Wrappers import DataOnDemand
 from Configurables import SubstitutePID
 subs = SubstitutePID(
     'PimforKm',
     Code = "DECTREE('[B0 -> (K*(892)0 -> K+ pi-) (eta_prime -> pi- pi+ gamma)]CC')",
     # note that SubstitutePID can't handle automatic CC
     Substitutions = {
-    'Bottom -> (K*(892)0 -> K+ ^pi-) Meson': 'K-',
-    'Bottom -> (K*(892)~0 -> K- ^pi+) Meson': 'K+',
+    'B0-> (K*(892)0 -> K+ ^pi-) Meson': 'K-',
+    'B0 -> (K*(892)~0 -> K- ^pi+) Meson': 'K+',
     }
 )
-
-from PhysSelPython.Wrappers import Selection
-from PhysSelPython.Wrappers import SelectionSequence
-from PhysSelPython.Wrappers import DataOnDemand
 
 # Stream and stripping line we want to use
 tesLoc = '/Event/{0}/Phys/{1}/Particles'.format(stream, line)
@@ -30,7 +30,7 @@ strippingSels = [DataOnDemand(Location=tesLoc)]
 
 # create a selection using the substitution algorithm
 selSub = Selection(
-    'KpforPip_sel',
+    'PimforKm_sel',
     Algorithm=subs,
     RequiredSelections=strippingSels
 )
@@ -38,12 +38,12 @@ selSub = Selection(
 selSeq = SelectionSequence('selSeq', TopSelection=selSub)
 
 
-from Configurables import DecayTreeTuple
-from DecayTreeTuple.Configuration import *
+
 tuple=DecayTreeTuple("PimforKmTuple")
-tuple.Decay="[B0 -> ^(K*(892)0 -> ^K+ ^K-) ^(eta_prime -> ^pi- ^pi+ ^gamma)]CC"
-tuple.Branches={"B0":"[B0 -> (K*(892)0 -> K+ K-) (eta_prime -> pi- pi+ gamma)]CC"}
 tuple.Inputs=[selSeq.outputLocation()]
+tuple.Decay="[B0 -> ^(K*(892)0 -> ^K+ ^K-) ^(eta_prime -> ^pi- ^pi+ ^gamma))]CC"
+tuple.Branches={"B0":"[B0 -> (K*(892)0 -> K+ K-) (eta_prime -> pi- pi+ gamma)]CC"}
+
 
 tuple.ToolList += [
     "TupleToolGeometry"
@@ -183,10 +183,12 @@ tistos.TriggerList=["L0PhotonDecision",
                     "Hlt2Topo3BodySimpleDecision",
                     "Hlt2Topo4BodySimpleDecision"]
 
-
+seq=GaudiSequencer('MyTupleSeq')
+seq.Members += [selSeq.sequence()]
+seq.Members += [tuple]
+DaVinci().appendToMainSequence([seq])
 DaVinci().InputType='MDST'
 DaVinci().RootInTES='/Event/{0}'.format(stream)
-DaVinci().UserAlgorithms+=[tuple]
 DaVinci().TupleFile="Output.root"
 DaVinci().HistogramFile="histos.root"
 DaVinci().DataType='2012'
@@ -199,10 +201,10 @@ DaVinci().Simulation=False
 
 from GaudiConf import IOHelper
 
-# Use the local input data
+#Use the local input data
 IOHelper().inputFiles([
-       './00041836_00000057_1.bhadron.mdst'
-        ], clear=True)
+      './00041836_00000057_1.bhadron.mdst'
+      ], clear=True)
 
 
 
