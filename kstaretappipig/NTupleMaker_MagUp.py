@@ -111,7 +111,6 @@ tuple.B0.KStarOnly.daughtersToConstrain = ["K*(892)0"]
 tuple.B0.addTupleTool('TupleToolDecayTreeFitter/PVOnly')
 tuple.B0.PVOnly.Verbose=True
 tuple.B0.PVOnly.constrainToOriginVertex=True
-
 #========================================REFIT WITH JUST DAUGHTERS CONSTRAINED================================
 tuple.B0.addTupleTool('TupleToolDecayTreeFitter/Conskstar_etap')
 tuple.B0.Conskstar_etap.Verbose=True
@@ -190,10 +189,29 @@ piminus0_hybrid.Variables ={
 gamma_hybrid.Variables = {
     'eta':'ETA'
     }
+#==============================MassSubs=====================================
+from Configurables import TupleToolSubMass
+
+tuple.B0.addTool(TupleToolSubMass)
+tuple.B0.ToolList += ["TupleToolSubMass"]
+tuple.B0.TupleToolSubMass.Substitution += ["pi- => K-"]
+tuple.B0.TupleToolSubMass.Substitution += ["K+ => pi+"]
+tuple.B0.TupleToolSubMass.Substitution += ["pi+ => K+"]
+tuple.B0.TupleToolSubMass.Substitution += ["pi+ => p+"]
+tuple.B0.TupleToolSubMass.Substitution += ["pi- => p~-"]
+tuple.B0.TupleToolSubMass.Substitution += ["K+ => p+"]
+tuple.B0.TupleToolSubMass.Substitution += ["gamma => pi0"]
+tuple.B0.TupleToolSubMass.Substitution += ["gamma => e-"]
+tuple.B0.TupleToolSubMass.Substitution += ["gamma => e+"]
+tuple.B0.TupleToolSubMass.Substitution += ["pi- => mu-"]
+tuple.B0.TupleToolSubMass.Substitution += ["pi+ => mu+"]
+tuple.B0.TupleToolSubMass.DoubleSubstitution += ["K+/pi- => pi+/K-"]
+tuple.B0.TupleToolSubMass.DoubleSubstitution += ["pi+/pi- => pi-/pi+"]
+tuple.B0.TupleToolSubMass.DoubleSubstitution += ["pi+/pi- => mu+/mu-"]
+
 
 #==============================TRIGGER DECISIONS==============================-
 
-                 
 
 from Configurables import TupleToolTISTOS
 tistos=tuple.B0.addTupleTool(TupleToolTISTOS, name="TupleToolTISTOS")

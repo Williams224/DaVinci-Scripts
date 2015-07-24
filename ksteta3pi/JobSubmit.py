@@ -4,9 +4,9 @@ import getpass
 from distutils.util import strtobool
 
 polarity='MagDown'
-datatype='Data'
+datatype='MC'
 substitution='None'
-channel='kstar_eta_3pi'
+channel='11104020'
 
 
 b=Job()
@@ -19,7 +19,7 @@ if datatype=='Data':
     if substitution=='PimforKm':
         b.application.optsfile='DNTupleMaker_PimforKm.py'
 b.outputfiles=[DiracFile('Output.root')]
-b.inputdata = b.application.readInputData('{0}_12_{1}_{2}.py'.format(datatype,polarity,channel))
+b.inputdata = b.application.readInputData('{0}_12_{1}_{2}.py'.format(datatype,channel,polarity))
 if substitution=='None':
     b.comment='{0}_12_{1}_{2}'.format(datatype,polarity,channel)
 if substitution=='PimforKm':
@@ -46,7 +46,7 @@ if datatype=='Data':
     if substitution=='PimforKm':
         b2.application.optsfile='DNTupleMaker_PimforKm.py'
 b2.outputfiles=[DiracFile('Output.root')]
-b2.inputdata = b2.application.readInputData('{0}_12_{1}_{2}.py'.format(datatype,polarity,channel))
+b2.inputdata = b2.application.readInputData('{0}_12_{1}_{2}.py'.format(datatype,channel,polarity))
 if substitution=='None':
     b2.comment='{0}_12_{1}_{2}'.format(datatype,polarity,channel)
 if substitution=='PimforKm':
