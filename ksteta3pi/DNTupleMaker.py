@@ -10,7 +10,7 @@ line='B2XEtaB2eta3piKstarLine'
 from Configurables import DecayTreeTuple
 from DecayTreeTuple.Configuration import *
 tuple=DecayTreeTuple()
-tuple.Decay="[B0 -> ^(K*(892)0 -> ^K+ ^pi-) ^(eta -> ^pi- ^pi+ ^(pi0 -> ^gamma ^gamma))]CC"
+tuple.Decay="[[B0]cc -> ^(K*(892)0 -> ^K+ ^pi-) ^(eta -> ^pi- ^pi+ ^(pi0 -> ^gamma ^gamma))]CC"
 tuple.Branches={"B0":"[B0 -> (K*(892)0 -> K+ pi-) (eta -> pi- pi+ (pi0 -> gamma gamma))]CC"}
 tuple.Inputs=['Phys/{0}/Particles'.format(line)]
 
@@ -29,6 +29,7 @@ tuple.ToolList += [
     #, "TupleToolMCTruth"
     #, "TupleToolMCBackgroundInfo"
     , "TupleToolCaloHypo"
+    , "TupleToolRecoStats"
     #, "TupleToolTrackIsolation"
     ]
 
@@ -41,11 +42,16 @@ tuple.B0.addTupleTool('TupleToolDecayTreeFitter/ConsAll')
 tuple.B0.ConsAll.Verbose=True
 tuple.B0.ConsAll.constrainToOriginVertex=True
 tuple.B0.ConsAll.daughtersToConstrain = ["K*(892)0","eta"]
-#==============================REFIT WITH ONLY ETA AND PV CONTRAINED==============================
+#==============================REFIT WITH ETA AND pi0 AND PV CONTRAINED==============================
 tuple.B0.addTupleTool('TupleToolDecayTreeFitter/PVFit')
 tuple.B0.PVFit.Verbose=True
 tuple.B0.PVFit.constrainToOriginVertex=True
-tuple.B0.PVFit.daughtersToConstrain = ["eta"]
+tuple.B0.PVFit.daughtersToConstrain = ["eta","pi0"]
+#==============================REFIT WITH ETA AND pi0 AND PV CONTRAINED==============================
+tuple.B0.addTupleTool('TupleToolDecayTreeFitter/PVFitEtaOnly')
+tuple.B0.PVFitEtaOnly.Verbose=True
+tuple.B0.PVFitEtaOnly.constrainToOriginVertex=True
+tuple.B0.PVFitEtaOnly.daughtersToConstrain = ["eta"]
 #==============================REFIT WITH ONLY K* CONSTRAINED===================================
 tuple.B0.addTupleTool('TupleToolDecayTreeFitter/KStarOnly')
 tuple.B0.KStarOnly.Verbose=True

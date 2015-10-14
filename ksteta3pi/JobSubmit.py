@@ -6,7 +6,7 @@ from distutils.util import strtobool
 polarity='MagDown'
 datatype='MC'
 substitution='None'
-channel='11104020'
+channel='11164404'
 
 
 b=Job()

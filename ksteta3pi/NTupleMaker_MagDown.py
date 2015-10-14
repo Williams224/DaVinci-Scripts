@@ -101,11 +101,16 @@ tuple.B0.addTupleTool('TupleToolDecayTreeFitter/ConsAll')
 tuple.B0.ConsAll.Verbose=True
 tuple.B0.ConsAll.constrainToOriginVertex=True
 tuple.B0.ConsAll.daughtersToConstrain = ["K*(892)0","eta"]
-#==============================REFIT WITH ONLY ETA AND PV CONTRAINED==============================
+#==============================REFIT WITH ETA, PI0 AND PV CONTRAINED==============================
 tuple.B0.addTupleTool('TupleToolDecayTreeFitter/PVFit')
 tuple.B0.PVFit.Verbose=True
 tuple.B0.PVFit.constrainToOriginVertex=True
-tuple.B0.PVFit.daughtersToConstrain = ["eta"]
+tuple.B0.PVFit.daughtersToConstrain = ["eta","pi0"]
+#==============================REFIT WITH ONLY ETA AND PV CONSTRAINED==========================
+tuple.B0.addTupleTool('TupleToolDecayTreeFitter/PVFitEtaOnly')
+tuple.B0.PVFitEtaOnly.Verbose=True
+tuple.B0.PVFitEtaOnly.constrainToOriginVertex=True
+tuple.B0.PVFitEtaOnly.daughtersToConstrain = ["eta"]
 #==============================REFIT WITH ONLY K* CONSTRAINED===================================
 tuple.B0.addTupleTool('TupleToolDecayTreeFitter/KStarOnly')
 tuple.B0.KStarOnly.Verbose=True
