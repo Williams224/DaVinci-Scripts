@@ -43,15 +43,15 @@ tuple.B0.ConsAll.Verbose=True
 tuple.B0.ConsAll.constrainToOriginVertex=True
 tuple.B0.ConsAll.daughtersToConstrain = ["K*(892)0","eta"]
 #==============================REFIT WITH ETA AND pi0 AND PV CONTRAINED==============================
+tuple.B0.addTupleTool('TupleToolDecayTreeFitter/PVFitpf')
+tuple.B0.PVFitpf.Verbose=True
+tuple.B0.PVFitpf.constrainToOriginVertex=True
+tuple.B0.PVFitpf.daughtersToConstrain = ["eta","pi0"]
+#==============================REFIT WITH ETA AND pi0 AND PV CONTRAINED==============================
 tuple.B0.addTupleTool('TupleToolDecayTreeFitter/PVFit')
 tuple.B0.PVFit.Verbose=True
 tuple.B0.PVFit.constrainToOriginVertex=True
-tuple.B0.PVFit.daughtersToConstrain = ["eta","pi0"]
-#==============================REFIT WITH ETA AND pi0 AND PV CONTRAINED==============================
-tuple.B0.addTupleTool('TupleToolDecayTreeFitter/PVFitEtaOnly')
-tuple.B0.PVFitEtaOnly.Verbose=True
-tuple.B0.PVFitEtaOnly.constrainToOriginVertex=True
-tuple.B0.PVFitEtaOnly.daughtersToConstrain = ["eta"]
+tuple.B0.PVFit.daughtersToConstrain = ["eta"]
 #==============================REFIT WITH ONLY K* CONSTRAINED===================================
 tuple.B0.addTupleTool('TupleToolDecayTreeFitter/KStarOnly')
 tuple.B0.KStarOnly.Verbose=True
@@ -76,7 +76,7 @@ tuple.B0.Consnothing.constrainToOriginVertex=False
 ########################################=LOKI FUNCOR VARIABLES===============================================
 
 tuple.addBranches({'Kstar' : '[B0 -> ^(K*(892)0 -> K+ pi-) (eta-> pi- pi+ (pi0 -> gamma gamma))]CC',
-                   'eta_prime' : '[B0 -> (K*(892)0 -> K+ pi-) ^(eta-> pi- pi+ (pi0 -> gamma gamma))]CC',
+                   'eta' : '[B0 -> (K*(892)0 -> K+ pi-) ^(eta-> pi- pi+ (pi0 -> gamma gamma))]CC',
                    'Kplus' : '[B0 -> (K*(892)0 -> ^K+ pi-) (eta-> pi- pi+ (pi0 -> gamma gamma))]CC',
                    'piminus' : '[B0 -> (K*(892)0 -> K+ ^pi-) (eta-> pi- pi+ (pi0 -> gamma gamma))]CC',
                    'piplus' : '[B0 -> (K*(892)0 -> K+ pi-) (eta-> pi- ^pi+ (pi0 -> gamma gamma))]CC',
@@ -88,7 +88,7 @@ tuple.addBranches({'Kstar' : '[B0 -> ^(K*(892)0 -> K+ pi-) (eta-> pi- pi+ (pi0 -
 from LoKiPhys.decorators import MAXTREE,MINTREE,ISBASIC,HASTRACK,SUMTREE,PT,ABSID,NINTREE,ETA,TRPCHI2
 B0_hybrid=tuple.B0.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_B0')
 Kstar_hybrid=tuple.Kstar.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_Kstar')
-eta_hybrid=tuple.eta_prime.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_eta')
+eta_hybrid=tuple.eta.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_eta')
 Kplus_hybrid=tuple.Kplus.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_Kplus')
 piminus_hybrid=tuple.piminus.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_piminus')
 piplus_hybrid=tuple.piplus.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_piplus')
