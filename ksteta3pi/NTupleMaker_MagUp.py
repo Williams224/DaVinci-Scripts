@@ -64,7 +64,7 @@ from DecayTreeTuple.Configuration import *
 line = 'B2XEtaB2eta3piKstarLine'
 
 tuple=DecayTreeTuple()
-tuple.Decay="[B0[cc] -> ^(K*(892)0 -> ^K+ ^pi-) ^(eta -> ^pi- ^pi+ ^(pi0 -> ^gamma ^gamma))]CC"
+tuple.Decay="[B0 -> ^(K*(892)0 -> ^K+ ^pi-) ^(eta -> ^pi- ^pi+ ^(pi0 -> ^gamma ^gamma))]CC"
 tuple.Branches={"B0":"[B0 -> (K*(892)0 -> K+ pi-) (eta -> pi- pi+ (pi0 -> gamma gamma))]CC"}
 tuple.Inputs=['/Event/Phys/{0}/Particles'.format(line)]
 tuple.addTool(TupleToolL0Calo())
@@ -288,10 +288,10 @@ DaVinci().Simulation=simulation
 
 
 
-#from GaudiConf import IOHelper
+from GaudiConf import IOHelper
 
 # Use the local input data
-#IOHelper().inputFiles([
- #   '00038851_00000006_2.AllStreams.dst'
-#], clear=True)
+IOHelper().inputFiles([
+    '00038851_00000006_2.AllStreams.dst'
+], clear=True)
 

@@ -10,7 +10,7 @@ line='B2XEtaB2eta3piKstarLine'
 from Configurables import DecayTreeTuple
 from DecayTreeTuple.Configuration import *
 tuple=DecayTreeTuple()
-tuple.Decay="[[B0]cc -> ^(K*(892)0 -> ^K+ ^pi-) ^(eta -> ^pi- ^pi+ ^(pi0 -> ^gamma ^gamma))]CC"
+tuple.Decay="[B0 -> ^(K*(892)0 -> ^K+ ^pi-) ^(eta -> ^pi- ^pi+ ^(pi0 -> ^gamma ^gamma))]CC"
 tuple.Branches={"B0":"[B0 -> (K*(892)0 -> K+ pi-) (eta -> pi- pi+ (pi0 -> gamma gamma))]CC"}
 tuple.Inputs=['Phys/{0}/Particles'.format(line)]
 
