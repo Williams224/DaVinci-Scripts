@@ -37,7 +37,7 @@ if simulation:
     streams=buildStreams(stripping=config,archive=archive)
 
     MyStream= StrippingStream("MyStream")
-    MyLines= ["StrippingB2XEtaLb2pKeta3piLine"]x
+    MyLines= ["StrippingB2XEtaLb2pKeta3piLine"]
 
     for stream in streams:
         for line in stream.lines:
@@ -64,8 +64,8 @@ from DecayTreeTuple.Configuration import *
 line = 'B2XEtaLb2pKeta3piLine'
 
 tuple=DecayTreeTuple()
-tuple.Decay="[^Lambda_b0 -> ^p+ ^K- ^(eta -> ^pi+ ^pi- ^(pi0-> ^gamma ^gamma))]CC"
-tuple.Branches={"Lambda_b0":"[^Lambda_b0 -> p+ K- (eta -> pi+ pi- (pi0 -> gamma gamma))]CC"}
+tuple.Decay="[Lambda_b0 -> ^p+ ^K- ^(eta -> ^pi+ ^pi- ^(pi0 -> ^gamma ^gamma))]CC"
+tuple.Branches={"Lambda_b0":"[Lambda_b0 -> p+ K- (eta -> pi+ pi- (pi0 -> gamma gamma))]CC"}
 tuple.Inputs=['/Event/Phys/{0}/Particles'.format(line)]
 tuple.addTool(TupleToolL0Calo())
 tuple.TupleToolL0Calo.TriggerClusterLocation="/Event/Trig/L0/Calo"
@@ -122,9 +122,9 @@ tuple.Lambda_b0.PVOnly.Verbose=True
 tuple.Lambda_b0.PVOnly.constrainToOriginVertex=True
 #========================================REFIT WITH JUST DAUGHTERS CONSTRAINED================================
 tuple.Lambda_b0.addTupleTool('TupleToolDecayTreeFitter/NoPVFit')
-tuple.Lambda_b0.Conskstar_eta.Verbose=True
-tuple.Lambda_b0.Conskstar_eta.constrainToOriginVertex=False
-tuple.Lambda_b0.Conskstar_eta.daughtersToConstrain = ["eta","p+","K-"]
+tuple.Lambda_b0.NoPVFit.Verbose=True
+tuple.Lambda_b0.NoPVFit.constrainToOriginVertex=False
+tuple.Lambda_b0.NoPVFit.daughtersToConstrain = ["eta","p+","K-"]
 
 #========================================REFIT WITH NOTHING CONSTRAINED========================================
 tuple.Lambda_b0.addTupleTool('TupleToolDecayTreeFitter/Consnothing')
@@ -137,11 +137,11 @@ tuple.addBranches({
     'proton' : '[Lambda_b0 -> ^p+ K- (eta -> pi+ pi- (pi0 -> gamma gamma))]CC',
     'Kminus' : '[Lambda_b0 -> p+ ^K- (eta -> pi+ pi- (pi0 -> gamma gamma))]CC',
     'eta' : '[Lambda_b0 -> p+ K- ^(eta -> pi+ pi- (pi0 -> gamma gamma))]CC',
-    'piplus':'[Lambda_b0 -> p+ ^K- (eta -> ^pi+ pi- (pi0 -> gamma gamma))]CC',
-    'piminus':'[Lambda_b0 -> p+ ^K- (eta -> pi+ ^pi- (pi0 -> gamma gamma))]CC',
-    'pi0':'[Lambda_b0 -> p+ ^K- (eta -> pi+ pi- ^(pi0 -> gamma gamma))]CC',
-    'gamma':'[Lambda_b0 -> p+ ^K- (eta -> pi+ pi- (pi0 -> ^gamma gamma))]CC',
-    'gamma0':'[Lambda_b0 -> p+ ^K- (eta -> pi+ pi- ^(pi0 -> gamma ^gamma))]CC',
+    'piplus':'[Lambda_b0 -> p+ K- (eta -> ^pi+ pi- (pi0 -> gamma gamma))]CC',
+    'piminus':'[Lambda_b0 -> p+ K- (eta -> pi+ ^pi- (pi0 -> gamma gamma))]CC',
+    'pi0':'[Lambda_b0 -> p+ K- (eta -> pi+ pi- ^(pi0 -> gamma gamma))]CC',
+    'gamma':'[Lambda_b0 -> p+ K- (eta -> pi+ pi- (pi0 -> ^gamma gamma))]CC',
+    'gamma0':'[Lambda_b0 -> p+ K- (eta -> pi+ pi- (pi0 -> gamma ^gamma))]CC',
 })
 
 
@@ -159,8 +159,8 @@ pi0_hybrid=tuple.pi0.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_pi0')
 preamble=[
     'TRACK_MAX_PT= MAXTREE(PT, ISBASIC & HASTRACK, -666)',
     'TRACK_MIN_PT= MINTREE(PT, ISBASIC & HASTRACK)',
-    'SUMTRACK_PT= SUMTREE((211 == ABSID)|(-211 == ABSID)|(321 == ABSID)|(-321 == ABSID)|(2212 == ABSID)|(-2212 == ABSID)),PT)',
-    'SUM_PCHI2= SUMTREE((211 == ABSID)|(-211 == ABSID)|(321 == ABSID)|(-321 == ABSID)|(2212 == ABSID)|(-2212 == ABSID)),TRPCHI2)'
+    'SUMTRACK_PT= SUMTREE((211 == ABSID)|(-211 == ABSID)|(321 == ABSID)|(-321 == ABSID)|(2212 == ABSID)|(-2212 == ABSID),PT)',
+    'SUM_PCHI2= SUMTREE((211 == ABSID)|(-211 == ABSID)|(321 == ABSID)|(-321 == ABSID)|(2212 == ABSID)|(-2212 == ABSID),TRPCHI2)'
     ]
 Lambda_b0_hybrid.Preambulo=preamble
 
@@ -203,6 +203,32 @@ gamma0_hybrid.Variables = {
 pi0_hybrid.Variables = {
     'eta':'ETA'
     }
+
+########MASS SUBSTITUTIONS#########
+
+from Configurables import TupleToolSubMass
+
+tuple.Lambda_b0.addTool(TupleToolSubMass)
+tuple.Lambda_b0.ToolList += ["TupleToolSubMass"]
+tuple.Lambda_b0.TupleToolSubMass.Substitution += ["p+ => K+"]
+tuple.Lambda_b0.TupleToolSubMass.Substitution += ["p+ => pi+"]
+tuple.Lambda_b0.TupleToolSubMass.Substitution += ["K- => pi-"]
+tuple.Lambda_b0.TupleToolSubMass.Substitution += ["K- => p~-"]
+tuple.Lambda_b0.TupleToolSubMass.Substitution += ["pi+ => p+"]
+tuple.Lambda_b0.TupleToolSubMass.Substitution += ["pi+ => K+"]
+tuple.Lambda_b0.TupleToolSubMass.Substitution += ["pi- => K-"]
+tuple.Lambda_b0.TupleToolSubMass.Substitution += ["pi- => p~-"]
+tuple.Lambda_b0.TupleToolSubMass.Substitution += ["gamma => pi0"]
+tuple.Lambda_b0.TupleToolSubMass.Substitution += ["gamma => e-"]
+tuple.Lambda_b0.TupleToolSubMass.Substitution += ["gamma => e+"]
+tuple.Lambda_b0.TupleToolSubMass.Substitution += ["pi- => mu-"]
+tuple.Lambda_b0.TupleToolSubMass.Substitution += ["pi+ => mu+"]
+tuple.Lambda_b0.TupleToolSubMass.Substitution += ["pi0 => eta"]
+tuple.Lambda_b0.TupleToolSubMass.DoubleSubstitution += ["K-/p+ => p~-/K+"]
+tuple.Lambda_b0.TupleToolSubMass.DoubleSubstitution += ["pi+/pi- => pi-/pi+"]
+tuple.Lambda_b0.TupleToolSubMass.DoubleSubstitution += ["pi+/pi- => mu+/mu-"]
+
+
 
 #==============================TRIGGER DECISIONS==============================-
 
@@ -281,10 +307,10 @@ DaVinci().Simulation=simulation
 
 
 
-#from GaudiConf import IOHelper
+from GaudiConf import IOHelper
 
 # Use the local input data
-#IOHelper().inputFiles([
- #   '00038851_00000006_2.AllStreams.dst'
-#], clear=True)
+IOHelper().inputFiles([
+    '00038909_00000002_2.AllStreams.dst'
+], clear=True)
 
