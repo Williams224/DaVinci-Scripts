@@ -64,7 +64,7 @@ from DecayTreeTuple.Configuration import *
 line = 'B2XEtaB2eta3piKstarLine'
 
 tuple=DecayTreeTuple()
-tuple.Decay="[B0 -> ^(K*(892)0 -> ^K+ ^pi-) ^(eta -> ^pi- ^pi+ ^(pi0 -> ^gamma ^gamma))]CC"
+tuple.Decay="[[B0]cc -> ^(K*(892)0 -> ^K+ ^pi-) ^(eta -> ^pi- ^pi+ ^(pi0 -> ^gamma ^gamma))]CC"
 tuple.Branches={"B0":"[B0 -> (K*(892)0 -> K+ pi-) (eta -> pi- pi+ (pi0 -> gamma gamma))]CC"}
 tuple.Inputs=['/Event/Phys/{0}/Particles'.format(line)]
 tuple.addTool(TupleToolL0Calo())
@@ -85,10 +85,10 @@ tuple.ToolList += [
     , "TupleToolTrackInfo"
     , "TupleToolVtxIsoln"
     , "TupleToolPhotonInfo"
-    , "TupleToolMCTruth"
     , "TupleToolMCBackgroundInfo"
     , "TupleToolCaloHypo"
     , "TupleToolTrackIsolation"
+    , "TupleToolPi0Info"
     ]
 
 
@@ -260,7 +260,22 @@ tuple.piminus0.addTool(TupleToolL0Calo,name="piminus0L0Calo")
 tuple.piminus0.ToolList += ["TupleToolL0Calo/piminus0L0Calo"]
 tuple.piminus0.piminus0L0Calo.WhichCalo="HCAL"
 
-
+#================================CONFIGURE TUPLETOOLMCTRUTH========================================================
+from Configurables import TupleToolMCTruth
+tuple.addTool(TupleToolMCTruth)
+tuple.ToolList += ["TupleToolMCTruth"]
+tuple.TupleToolMCTruth.ToolList += [
+    "MCTupleToolHierarchy",
+    "MCTupleToolKinematic",
+#    "MCTupleToolDecayType",
+ #   "MCTupleToolReconstructed",
+  #  "MCTupleToolPID",
+   # "MCTupleToolP2VV",
+#    "MCTupleToolAngles",
+#    "MCTupleToolInteractions",
+ #   "MCTupleToolPrimaries",
+  #  "MCTupleToolPrompt"
+    ]
 
 etuple=EventTuple()
 etuple.ToolList=["TupleToolEventInfo"]
@@ -270,7 +285,7 @@ from Configurables import MCDecayTreeTuple
 mctuple=MCDecayTreeTuple("mctuple")
 mctuple.ToolList+=["MCTupleToolKinematic","MCTupleToolReconstructed","MCTupleToolHierarchy","MCTupleToolDecayType","MCTupleToolPID"]
 
-mctuple.Decay="[B0 -> ^(K*(892)0 -> ^K+ ^pi-) ^(eta -> ^pi- ^pi+ ^(pi0-> ^gamma ^gamma))]CC"
+mctuple.Decay="[[B0]cc => ^(K*(892)0 => ^K+ ^pi-) ^(eta => ^pi- ^pi+ ^(pi0=> ^gamma ^gamma))]CC"
 
 MySequencer.Members.append(etuple)
 MySequencer.Members.append(tuple)
@@ -281,7 +296,7 @@ DaVinci().UserAlgorithms+=[MySequencer]
 DaVinci().TupleFile="Output.root"
 DaVinci().HistogramFile="histos.root"
 DaVinci().DataType='2012'
-DaVinci().EvtMax=-1
+DaVinci().EvtMax=5000
 DaVinci().PrintFreq=1000
 DaVinci().MoniSequence=[tuple]
 DaVinci().Simulation=simulation
