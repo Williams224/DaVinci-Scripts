@@ -47,10 +47,34 @@ tuple.B0.addTupleTool('TupleToolDecayTreeFitter/PVFitpf')
 tuple.B0.PVFitpf.Verbose=True
 tuple.B0.PVFitpf.constrainToOriginVertex=True
 tuple.B0.PVFitpf.daughtersToConstrain = ["eta","pi0"]
-#==============================REFIT WITH ETA AND pi0 AND PV CONTRAINED==============================
+#==============================REFIT WITH ETA AND PV CONTRAINED==============================
 tuple.B0.addTupleTool('TupleToolDecayTreeFitter/PVFit')
 tuple.B0.PVFit.Verbose=True
 tuple.B0.PVFit.constrainToOriginVertex=True
+tuple.B0.PVFit.daughtersToConstrain = ["eta"]
+#==============================REFIT WITH ETA AND PV CONTRAINED - Kplus -> piminus swap ==============
+tuple.B0.addTupleTool('TupleToolDecayTreeFitter/PVFitKforPi')
+tuple.B0.PVFit.Verbose=True
+tuple.B0.PVFit.constrainToOriginVertex=True
+tuple.B0.PVFit.Substitutions={"[B0 -> (K*(892)0 -> ^K+ pi-) (eta -> pi- pi+ (pi0 -> gamma gamma))]CC" : "pi+" }
+tuple.B0.PVFit.daughtersToConstrain = ["eta"]
+#==============================REFIT WITH ETA AND PV CONTRAINED - piminus -> Kminus swap =============
+tuple.B0.addTupleTool('TupleToolDecayTreeFitter/PVFitpiminusforK')
+tuple.B0.PVFit.Verbose=True
+tuple.B0.PVFit.constrainToOriginVertex=True
+tuple.B0.PVFit.Substitutions={"[B0 -> (K*(892)0 -> K+ ^pi-) (eta -> pi- pi+ (pi0 -> gamma gamma))]CC" : "K-" }
+tuple.B0.PVFit.daughtersToConstrain = ["eta"]
+#==============================REFIT WITH ETA AND PV CONTRAINED - piminus0 -> Kminus swap ============
+tuple.B0.addTupleTool('TupleToolDecayTreeFitter/PVFitpiminus0forK')
+tuple.B0.PVFit.Verbose=True
+tuple.B0.PVFit.constrainToOriginVertex=True
+tuple.B0.PVFit.Substitutions={"[B0 -> (K*(892)0 -> K+ pi-) (eta -> ^pi- pi+ (pi0 -> gamma gamma))]CC" : "K-" }
+tuple.B0.PVFit.daughtersToConstrain = ["eta"]
+#==============================REFIT WITH ETA AND PV CONTRAINED - piplus -> Kplus swap =============
+tuple.B0.addTupleTool('TupleToolDecayTreeFitter/PVFitpiplusforK')
+tuple.B0.PVFit.Verbose=True
+tuple.B0.PVFit.constrainToOriginVertex=True
+tuple.B0.PVFit.Substitutions={"[B0 -> (K*(892)0 -> K+ pi-) (eta -> pi- ^pi+ (pi0 -> gamma gamma))]CC" : "K+" }
 tuple.B0.PVFit.daughtersToConstrain = ["eta"]
 #==============================REFIT WITH ONLY K* CONSTRAINED===================================
 tuple.B0.addTupleTool('TupleToolDecayTreeFitter/KStarOnly')

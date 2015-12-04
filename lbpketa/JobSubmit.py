@@ -4,9 +4,9 @@ import getpass
 from distutils.util import strtobool
 
 polarity='MagDown'
-datatype='Data'
+datatype='MC'
 substitution='None'
-channel='kstar_eta_3pi'
+channel='lbpketa'
 
 
 b=Job()
