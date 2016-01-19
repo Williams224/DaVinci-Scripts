@@ -111,6 +111,101 @@ tuple.B0.addTupleTool('TupleToolDecayTreeFitter/PVFit')
 tuple.B0.PVFit.Verbose=True
 tuple.B0.PVFit.constrainToOriginVertex=True
 tuple.B0.PVFit.daughtersToConstrain = ["eta"]
+#==============================REFIT WITH ETA AND PV K for piCONTRAINED==============================
+tuple.B0.addTupleTool('TupleToolDecayTreeFitter/PVFitKforpi')
+tuple.B0.PVFitKforpi.Verbose=True
+tuple.B0.PVFitKforpi.constrainToOriginVertex=True
+tuple.B0.PVFitKforpi.daughtersToConstrain = ["eta"]
+tuple.B0.PVFitKforpi.Substitutions={
+    "B0 -> (K*(892)0 -> ^K+ pi-) (eta -> pi- pi+ (pi0 -> gamma gamma))" : "pi+" ,
+    "B~0 -> (K*(892)~0 -> ^K- pi+) (eta -> pi+ pi- (pi0 -> gamma gamma))" : "pi-" ,
+    }
+
+#==============================REFIT WITH ETA AND PV CONTRAINED - piminus ->K swap ==============
+tuple.B0.addTupleTool('TupleToolDecayTreeFitter/PVFitpiminusforK')
+tuple.B0.PVFitpiminusforK.Verbose=True
+tuple.B0.PVFitpiminusforK.constrainToOriginVertex=True
+tuple.B0.PVFitpiminusforK.daughtersToConstrain = ["eta"]
+tuple.B0.PVFitpiminusforK.Substitutions={
+    "B0 -> (K*(892)0 ->  K+ ^pi-) (eta -> pi- pi+ (pi0 -> gamma gamma))" : "K-" ,
+    "B~0 -> (K*(892)~0 ->  K- ^pi+) (eta -> pi+ pi- (pi0 -> gamma gamma))" : "K+" ,
+    }
+#==============================REFIT WITH ETA AND PV CONTRAINED - piminus0 -> Kminus swap =============
+tuple.B0.addTupleTool('TupleToolDecayTreeFitter/PVFitpiminus0forK')
+tuple.B0.PVFitpiminus0forK.Verbose=True
+tuple.B0.PVFitpiminus0forK.constrainToOriginVertex=True
+tuple.B0.PVFitpiminus0forK.daughtersToConstrain = ["eta"]
+tuple.B0.PVFitpiminus0forK.Substitutions={
+    "B0 -> (K*(892)0 ->  K+ pi-) (eta -> ^pi- pi+ (pi0 -> gamma gamma))" : "K-" ,
+    "B~0 -> (K*(892)~0 ->  K- pi+) (eta -> ^pi+ pi- (pi0 -> gamma gamma))" : "K+" ,
+    }
+#==============================REFIT WITH ETA AND PV CONTRAINED - piplus -> Kminus swap ============
+tuple.B0.addTupleTool('TupleToolDecayTreeFitter/PVFitpiplusforK')
+tuple.B0.PVFitpiplusforK.Verbose=True
+tuple.B0.PVFitpiplusforK.constrainToOriginVertex=True
+tuple.B0.PVFitpiplusforK.daughtersToConstrain = ["eta"]
+tuple.B0.PVFitpiplusforK.Substitutions={
+    "B0 -> (K*(892)0 ->  K+ pi-) (eta -> pi- ^pi+ (pi0 -> gamma gamma))" : "K+" ,
+    "B~0 -> (K*(892)~0 ->  K- pi+) (eta -> pi+ ^pi- (pi0 -> gamma gamma))" : "K-" ,
+    }
+#proton swaps
+#==============================REFIT WITH ETA AND PV K for proton CONTRAINED==============================
+tuple.B0.addTupleTool('TupleToolDecayTreeFitter/PVFitKforproton')
+tuple.B0.PVFitKforproton.Verbose=True
+tuple.B0.PVFitKforproton.constrainToOriginVertex=True
+tuple.B0.PVFitKforproton.daughtersToConstrain = ["eta"]
+tuple.B0.PVFitKforproton.Substitutions={
+    "B0 -> (K*(892)0 -> ^K+ pi-) (eta -> pi- pi+ (pi0 -> gamma gamma))" : "p+" ,
+    "B~0 -> (K*(892)~0 -> ^K- pi+) (eta -> pi+ pi- (pi0 -> gamma gamma))" : "p~-" ,
+    }
+
+#==============================REFIT WITH ETA AND PV CONTRAINED - piminus ->K swap ==============
+tuple.B0.addTupleTool('TupleToolDecayTreeFitter/PVFitpiminusforproton')
+tuple.B0.PVFitpiminusforproton.Verbose=True
+tuple.B0.PVFitpiminusforproton.constrainToOriginVertex=True
+tuple.B0.PVFitpiminusforproton.daughtersToConstrain = ["eta"]
+tuple.B0.PVFitpiminusforproton.Substitutions={
+    "B0 -> (K*(892)0 ->  K+ ^pi-) (eta -> pi- pi+ (pi0 -> gamma gamma))" : "p~-" ,
+    "B~0 -> (K*(892)~0 ->  K- ^pi+) (eta -> pi+ pi- (pi0 -> gamma gamma))" : "p+" ,
+    }
+#==============================REFIT WITH ETA AND PV CONTRAINED - piminus0 -> Kminus swap =============
+tuple.B0.addTupleTool('TupleToolDecayTreeFitter/PVFitpiminus0forproton')
+tuple.B0.PVFitpiminus0forproton.Verbose=True
+tuple.B0.PVFitpiminus0forproton.constrainToOriginVertex=True
+tuple.B0.PVFitpiminus0forproton.daughtersToConstrain = ["eta"]
+tuple.B0.PVFitpiminus0forproton.Substitutions={
+    "B0 -> (K*(892)0 ->  K+ pi-) (eta -> ^pi- pi+ (pi0 -> gamma gamma))" : "p~-" ,
+    "B~0 -> (K*(892)~0 ->  K- pi+) (eta -> ^pi+ pi- (pi0 -> gamma gamma))" : "p+" ,
+    }
+#==============================REFIT WITH ETA AND PV CONTRAINED - piplus -> Kminus swap ============
+tuple.B0.addTupleTool('TupleToolDecayTreeFitter/PVFitpiplusforproton')
+tuple.B0.PVFitpiplusforproton.Verbose=True
+tuple.B0.PVFitpiplusforproton.constrainToOriginVertex=True
+tuple.B0.PVFitpiplusforproton.daughtersToConstrain = ["eta"]
+tuple.B0.PVFitpiplusforproton.Substitutions={
+    "B0 -> (K*(892)0 ->  K+ pi-) (eta -> pi- ^pi+ (pi0 -> gamma gamma))" : "p+" ,
+    "B~0 -> (K*(892)~0 ->  K- pi+) (eta -> pi+ ^pi- (pi0 -> gamma gamma))" : "p~-" ,
+    }
+
+#==============================REFIT WITH ETA AND PV CONTRAINED - piplus -> Kminus swap ============
+tuple.B0.addTupleTool('TupleToolDecayTreeFitter/PVFitgammaforpi0')
+tuple.B0.PVFitgammaforpi0.Verbose=True
+tuple.B0.PVFitgammaforpi0.constrainToOriginVertex=True
+tuple.B0.PVFitgammaforpi0.daughtersToConstrain = ["eta"]
+tuple.B0.PVFitgammaforpi0.Substitutions={
+    "B0 -> (K*(892)0 ->  K+ pi-) (eta -> pi- pi+ (pi0 -> ^gamma gamma))" : "pi0" ,
+    "B~0 -> (K*(892)~0 ->  K- pi+) (eta -> pi+ pi- (pi0 -> ^gamma gamma))" : "pi0" ,
+    }
+
+#==============================REFIT WITH ETA AND PV CONTRAINED - piplus -> Kminus swap ============
+tuple.B0.addTupleTool('TupleToolDecayTreeFitter/PVFitgamma0forpi0')
+tuple.B0.PVFitgamma0forpi0.Verbose=True
+tuple.B0.PVFitgamma0forpi0.constrainToOriginVertex=True
+tuple.B0.PVFitgamma0forpi0.daughtersToConstrain = ["eta"]
+tuple.B0.PVFitgamma0forpi0.Substitutions={
+    "B0 -> (K*(892)0 ->  K+ pi-) (eta -> pi- pi+ (pi0 -> gamma ^gamma))" : "pi0" ,
+    "B~0 -> (K*(892)~0 ->  K- pi+) (eta -> pi+ pi- (pi0 -> gamma ^gamma))" : "pi0" ,
+    }
 #==============================REFIT WITH ONLY K* CONSTRAINED===================================
 tuple.B0.addTupleTool('TupleToolDecayTreeFitter/KStarOnly')
 tuple.B0.KStarOnly.Verbose=True
