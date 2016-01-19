@@ -335,12 +335,12 @@ DaVinci().MoniSequence=[tuple]
 DaVinci().Simulation=False
 
 
-from GaudiConf import IOHelper
+#from GaudiConf import IOHelper
 
 # Use the local input data
-IOHelper().inputFiles([
-    './00041836_00000057_1.bhadron.mdst'
-    ], clear=True)
+#IOHelper().inputFiles([
+ #   './00041836_00000057_1.bhadron.mdst'
+  #  ], clear=True)
 
 
 
