@@ -1,23 +1,19 @@
 import datetime as dt
 import time
 
-finishtime=dt.datetime(2015,7,16,7,30)
+#finishtime=dt.datetime(2015,26,10,5,30)
 
 #while dt.datetime.now()<finishtime:
-MopUpFails(199)
-MopUpFails(200)
-MopUpFails(203)
-MopUpFails(204)
-MopUpFails(205)
-MopUpFails(206)
-MopUpFails(207)
-MopUpFails(208)
-GetOutput(199)
-GetOutput(200)
-GetOutput(203)
-GetOutput(204)
-GetOutput(205)
-GetOutput(206)
-GetOutput(207)
-GetOutput(208)
-#time.sleep(600.0)
+#MopUpFails(528)
+#MopUpFails(529)
+#MopUpFails(530)
+#MopUpFails(531)
+#GetOutput(528)
+#GetOutput(529)
+#GetOutput(530)
+#GetOutput(531)
+#time.sleep(60.0)
+
+MopUpFails(544)
+GetOutput(544)
+time.sleep(60.0)
