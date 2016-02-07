@@ -1,3 +1,4 @@
+
 from Gaudi.Configuration import *
 from Configurables import DaVinci
 #from Configurables import AlgTool
@@ -89,9 +90,21 @@ tuple.ToolList += [
     , "TupleToolMCBackgroundInfo"
     , "TupleToolCaloHypo"
     , "TupleToolTrackIsolation"
+    , "TupleToolRecoStats"
+    ,
     ]
 
+from Configurables import TupleToolDecay
 tuple.addTool(TupleToolDecay,name="Lambda_b0")
+tuple.addTool(TupleToolDecay,name="Proton")
+tuple.addTool(TupleToolDecay,name="Kaon")
+tuple.addTool(TupleToolDecay,name="piminus")
+tuple.addTool(TupleToolDecay,name="piplus")
+tuple.addTool(TupleToolDecay,name="eta_prime")
+#
+#tuple.Lambda_b0.ToolList += [
+ #   "TupleToolP2VV"
+  #  ]
 
 from Configurables import TupleToolDecayTreeFitter
 
@@ -150,7 +163,20 @@ tuple.addBranches({'Proton':'[Lambda_b0 -> ^p+ K- (eta_prime -> pi- pi+ gamma)]C
                    'gamma' : '[Lambda_b0 -> p+ K- (eta_prime -> pi- pi+ ^gamma)]CC',
                    })
 
+from Configurables import TupleToolMCBackgroundInfo
+tuple.Lambda_b0.addTool( TupleToolMCBackgroundInfo )
+tuple.Lambda_b0.ToolList += [ "TupleToolMCBackgroundInfo" ]
+
+
+
 from LoKiPhys.decorators import MAXTREE,MINTREE,ISBASIC,HASTRACK,SUMTREE,PT,ABSID,NINTREE,ETA,TRPCHI2
+
+#eventtupletool=tuple.addTupleTool('LoKi::Hybrid::EventTupleTool/ETT')
+#eventtupletool.VOID_Variables = {
+#    "nTracks" : "TrSOURCE('Rec/Track/Best') >> TrSIZE"
+ #   ,"nPVs"   : "CONTAINS('Rec/Vertex/Primary')"
+  #   }
+
 Lb_hybrid=tuple.Lambda_b0.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_Lambda_b0')
 Proton_hybrid=tuple.Proton.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_Proton')
 Kaon_hybrid=tuple.Kaon.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_Kaon')
@@ -255,6 +281,23 @@ tistos.TriggerList=["L0PhotonDecision",
                     "Hlt2Topo3BodySimpleDecision",
                     "Hlt2Topo4BodySimpleDecision"]
 
+
+from Configurables import TupleToolMCTruth
+tuple.addTool(TupleToolMCTruth)
+tuple.ToolList += ["TupleToolMCTruth"]
+tuple.TupleToolMCTruth.ToolList += [
+        "MCTupleToolHierarchy",
+            "MCTupleToolKinematic",
+        #    "MCTupleToolDecayType",
+         #   "MCTupleToolReconstructed",
+          #  "MCTupleToolPID",
+           # "MCTupleToolP2VV",
+        #    "MCTupleToolAngles",
+        #    "MCTupleToolInteractions",
+         #   "MCTupleToolPrimaries",
+          #  "MCTupleToolPrompt"
+            ]
+
 from Configurables import TupleToolL0Calo
 
 tuple.Kaon.addTool(TupleToolL0Calo,name="KaonL0Calo")
@@ -299,10 +342,10 @@ DaVinci().Simulation=simulation
 
 
 
-#from GaudiConf import IOHelper
+from GaudiConf import IOHelper
 
 # Use the local input data
-#IOHelper().inputFiles([
- #   '00038909_00000002_2.AllStreams.dst'
-#], clear=True)
+IOHelper().inputFiles([
+    '00038905_00000002_2.AllStreams.dst'
+], clear=True)
 
