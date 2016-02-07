@@ -5,12 +5,12 @@ from Configurables import DaVinci
 from Configurables import GaudiSequencer
 MySequencer = GaudiSequencer('Sequence')
 #For 2012 MC
-DaVinci.DDDBtag='dddb-20130929-1'
-DaVinci.CondDBtag='sim-20130522-1-vc-mu100'
+#DaVinci.DDDBtag='dddb-20130929-1'
+#DaVinci.CondDBtag='sim-20130522-1-vc-mu100'
 
 #for 2011 MC
-#DaVinci.DDDBtag='dddb-20130929'
-#DaVinci.CondDBtag='sim-20130522-vc-mu100'
+DaVinci.DDDBtag='dddb-20130929'
+DaVinci.CondDBtag='sim-20130522-vc-mu100'
 
 simulation=True
 
@@ -32,7 +32,7 @@ if simulation:
     from Configurables import PhysConf
     PhysConf().CaloReProcessing=True
 
-    stripping="stripping21"
+    stripping="stripping21r1"
     config=strippingConfiguration(stripping)
     archive=strippingArchive(stripping)
     streams=buildStreams(stripping=config,archive=archive)
@@ -334,7 +334,7 @@ DaVinci().InputType='DST'
 DaVinci().UserAlgorithms+=[MySequencer]
 DaVinci().TupleFile="Output.root"
 DaVinci().HistogramFile="histos.root"
-DaVinci().DataType='2012'
+DaVinci().DataType='2011'
 DaVinci().EvtMax=-1
 DaVinci().PrintFreq=1000
 DaVinci().MoniSequence=[tuple]
@@ -346,6 +346,6 @@ from GaudiConf import IOHelper
 
 # Use the local input data
 IOHelper().inputFiles([
-    '00038905_00000002_2.AllStreams.dst'
+    '00038714_00000002_2.AllStreams.dst'
 ], clear=True)
 
