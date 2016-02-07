@@ -37,7 +37,7 @@ if simulation:
     streams=buildStreams(stripping=config,archive=archive)
 
     MyStream= StrippingStream("MyStream")
-    MyLines= ["StrippingB2XEtaLb2pKeta3piLine"]
+    MyLines= ["StrippingB2XEtaLb2pKetapLine"]
 
     for stream in streams:
         for line in stream.lines:
@@ -61,11 +61,11 @@ from Configurables import DecayTreeTuple
 from Configurables import TupleToolL0Calo
 from DecayTreeTuple.Configuration import *
 
-line = 'B2XEtaLb2pKeta3piLine'
+line = 'B2XEtaLb2pKetapLine'
 
 tuple=DecayTreeTuple()
-tuple.Decay="[Lambda_b0 -> ^p+ ^K- ^(eta -> ^pi+ ^pi- ^(pi0 -> ^gamma ^gamma))]CC"
-tuple.Branches={"Lambda_b0":"[Lambda_b0 -> p+ K- (eta -> pi+ pi- (pi0 -> gamma gamma))]CC"}
+tuple.Decay="[Lambda_b0 -> ^p+ ^K- ^(eta_prime -> ^pi- ^pi+ ^gamma)]CC"
+tuple.Branches={"Lambda_b0":"[Lambda_b0 -> p+ K- (eta_prime -> pi- pi+ gamma)]CC"}
 tuple.Inputs=['/Event/Phys/{0}/Particles'.format(line)]
 tuple.addTool(TupleToolL0Calo())
 tuple.TupleToolL0Calo.TriggerClusterLocation="/Event/Trig/L0/Calo"
@@ -91,70 +91,73 @@ tuple.ToolList += [
     , "TupleToolTrackIsolation"
     ]
 
-
 tuple.addTool(TupleToolDecay,name="Lambda_b0")
 
 from Configurables import TupleToolDecayTreeFitter
 
-#========================================REFIT WITH DAUGHTERS AND PV CONSTRAINED==============================
-#tuple.Lambda_b0.addTupleTool('TupleToolDecayTreeFitter/ConsAll')
-#tuple.Lambda_b0.ConsAll.Verbose=True
-#tuple.Lambda_b0.ConsAll.constrainToOriginVertex=True
-#tuple.Lambda_b0.ConsAll.daughtersToConstrain = ["p+","K-","eta"]
-#==============================REFIT WITH ETA, PI0 AND PV CONTRAINED==============================
-tuple.Lambda_b0.addTupleTool('TupleToolDecayTreeFitter/PVFitpf')
-tuple.Lambda_b0.PVFitpf.Verbose=True
-tuple.Lambda_b0.PVFitpf.constrainToOriginVertex=True
-tuple.Lambda_b0.PVFitpf.daughtersToConstrain = ["eta","p+","K-","pi0"]
-#==============================REFIT WITH ONLY ETA AND PV CONSTRAINED==========================
-tuple.Lambda_b0.addTupleTool('TupleToolDecayTreeFitter/PVFit')
-tuple.Lambda_b0.PVFit.Verbose=True
-tuple.Lambda_b0.PVFit.constrainToOriginVertex=True
-tuple.Lambda_b0.PVFit.daughtersToConstrain = ["eta","p+","K-"]
-#==============================REFIT WITH ONLY K* CONSTRAINED===================================
-#tuple.Lambda_b0.addTupleTool('TupleToolDecayTreeFitter/KStarOnly')
-#tuple.Lambda_b0.KStarOnly.Verbose=True
-#tuple.Lambda_b0.KStarOnly.constrainToOriginVertex=True
-#tuple.Lambda_b0.KStarOnly.daughtersToConstrain = ["K*(892)0"]
+
+#==============================REFIT WITH ALL CONSTRAINED======================================
+tuple.Lambda_b0.addTupleTool('TupleToolDecayTreeFitter/DTFAll')
+tuple.Lambda_b0.DTFAll.Verbose=True
+tuple.Lambda_b0.DTFAll.constrainToOriginVertex=True
+tuple.Lambda_b0.DTFAll.daughtersToConstrain = ["eta_prime"]
 #==============================REFIT WITH ONLY  PV CONTRAINED==============================
-tuple.Lambda_b0.addTupleTool('TupleToolDecayTreeFitter/PVOnly')
-tuple.Lambda_b0.PVOnly.Verbose=True
-tuple.Lambda_b0.PVOnly.constrainToOriginVertex=True
+tuple.Lambda_b0.addTupleTool('TupleToolDecayTreeFitter/DTFPVOnly')
+tuple.Lambda_b0.DTFPVOnly.Verbose=True
+tuple.Lambda_b0.DTFPVOnly.constrainToOriginVertex=True
 #========================================REFIT WITH JUST DAUGHTERS CONSTRAINED================================
-tuple.Lambda_b0.addTupleTool('TupleToolDecayTreeFitter/NoPVFit')
-tuple.Lambda_b0.NoPVFit.Verbose=True
-tuple.Lambda_b0.NoPVFit.constrainToOriginVertex=False
-tuple.Lambda_b0.NoPVFit.daughtersToConstrain = ["eta","p+","K-"]
+tuple.Lambda_b0.addTupleTool('TupleToolDecayTreeFitter/DTFPVNo')
+tuple.Lambda_b0.DTFPVNo.Verbose=True
+tuple.Lambda_b0.DTFPVNo.constrainToOriginVertex=False
+tuple.Lambda_b0.DTFPVNo.daughtersToConstrain = ["eta_prime"]
+#==============================REFIT WITH K SWAPPED FOR PI ALL CONSTRAINED ==============================
+tuple.Lambda_b0.addTupleTool('TupleToolDecayTreeFitter/DTFKforpi')
+tuple.Lambda_b0.DTFKforpi.Verbose=True
+tuple.Lambda_b0.DTFKforpi.constrainToOriginVertex=True
+tuple.Lambda_b0.DTFKforpi.daughtersToConstrain = ["eta_prime"]
+tuple.Lambda_b0.DTFKforpi.Substitutions={
+    "Lambda_b0 -> p+ ^K- (eta_prime -> pi- pi+ gamma)" : "pi-",
+    "Lambda_b~0 -> p~- ^K+ (eta_prime -> pi- pi+ gamma)" : "pi+",
+    }
 
-#========================================REFIT WITH NOTHING CONSTRAINED========================================
-tuple.Lambda_b0.addTupleTool('TupleToolDecayTreeFitter/Consnothing')
-tuple.Lambda_b0.Consnothing.Verbose=True
-tuple.Lambda_b0.Consnothing.constrainToOriginVertex=False
+#==============================REFIT WITH P SWAPPED FOR PI ALL CONSTRAINED ==============================
+tuple.Lambda_b0.addTupleTool('TupleToolDecayTreeFitter/DTFPforpi')
+tuple.Lambda_b0.DTFPforpi.Verbose=True
+tuple.Lambda_b0.DTFPforpi.constrainToOriginVertex=True
+tuple.Lambda_b0.DTFPforpi.daughtersToConstrain = ["eta_prime"]
+tuple.Lambda_b0.DTFPforpi.Substitutions={
+    "Lambda_b0 -> ^p+ K- (eta_prime -> pi- pi+ gamma)" : "pi+",
+    "Lambda_b~0 -> ^p~- K+ (eta_prime -> pi- pi+ gamma)" : "pi-",
+    }
 
-#========================================LOKI FUBNCTOR VARIABLES========================================
+#==============================REFIT WITH P SWAPPED FOR K ALL CONSTRAINED ==============================
+tuple.Lambda_b0.addTupleTool('TupleToolDecayTreeFitter/DTFPforK')
+tuple.Lambda_b0.DTFPforK.Verbose=True
+tuple.Lambda_b0.DTFPforK.constrainToOriginVertex=True
+tuple.Lambda_b0.DTFPforK.daughtersToConstrain = ["eta_prime"]
+tuple.Lambda_b0.DTFPforK.Substitutions={
+    "Lambda_b0 -> ^p+ K- (eta_prime -> pi- pi+ gamma)" : "K+",
+    "Lambda_b~0 -> ^p~- K+ (eta_prime -> pi- pi+ gamma)" : "K-",
+    }
 
-tuple.addBranches({
-    'proton' : '[Lambda_b0 -> ^p+ K- (eta -> pi+ pi- (pi0 -> gamma gamma))]CC',
-    'Kminus' : '[Lambda_b0 -> p+ ^K- (eta -> pi+ pi- (pi0 -> gamma gamma))]CC',
-    'eta' : '[Lambda_b0 -> p+ K- ^(eta -> pi+ pi- (pi0 -> gamma gamma))]CC',
-    'piplus':'[Lambda_b0 -> p+ K- (eta -> ^pi+ pi- (pi0 -> gamma gamma))]CC',
-    'piminus':'[Lambda_b0 -> p+ K- (eta -> pi+ ^pi- (pi0 -> gamma gamma))]CC',
-    'pi0':'[Lambda_b0 -> p+ K- (eta -> pi+ pi- ^(pi0 -> gamma gamma))]CC',
-    'gamma':'[Lambda_b0 -> p+ K- (eta -> pi+ pi- (pi0 -> ^gamma gamma))]CC',
-    'gamma0':'[Lambda_b0 -> p+ K- (eta -> pi+ pi- (pi0 -> gamma ^gamma))]CC',
-})
+########################################=LOKI FUNCOR VARIABLES===============================================
 
+tuple.addBranches({'Proton':'[Lambda_b0 -> ^p+ K- (eta_prime -> pi- pi+ gamma)]CC',
+                   'Kaon' : '[Lambda_b0 -> p+ ^K- (eta_prime -> pi- pi+ gamma)]CC',
+                   'eta_prime' : '[Lambda_b0 -> p+ K- ^(eta_prime -> pi- pi+ gamma)]CC',
+                   'piminus' : '[Lambda_b0 -> p+ K- (eta_prime -> ^pi- pi+ gamma)]CC',
+                   'piplus' : '[Lambda_b0 -> p+ K- (eta_prime -> pi- ^pi+ gamma)]CC',
+                   'gamma' : '[Lambda_b0 -> p+ K- (eta_prime -> pi- pi+ ^gamma)]CC',
+                   })
 
 from LoKiPhys.decorators import MAXTREE,MINTREE,ISBASIC,HASTRACK,SUMTREE,PT,ABSID,NINTREE,ETA,TRPCHI2
-Lambda_b0_hybrid=tuple.Lambda_b0.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_Lambda_b0')
-proton_hybrid=tuple.proton.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_proton')
-Kminus_hybrid=tuple.Kminus.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_Kminus')
-eta_hybrid=tuple.eta.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_eta')
+Lb_hybrid=tuple.Lambda_b0.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_Lambda_b0')
+Proton_hybrid=tuple.Proton.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_Proton')
+Kaon_hybrid=tuple.Kaon.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_Kaon')
+eta_prime_hybrid=tuple.eta_prime.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_eta_prime')
 piminus_hybrid=tuple.piminus.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_piminus')
 piplus_hybrid=tuple.piplus.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_piplus')
 gamma_hybrid=tuple.gamma.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_gamma')
-gamma0_hybrid=tuple.gamma0.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_gamma0')
-pi0_hybrid=tuple.pi0.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_pi0')
 
 preamble=[
     'TRACK_MAX_PT= MAXTREE(PT, ISBASIC & HASTRACK, -666)',
@@ -162,50 +165,44 @@ preamble=[
     'SUMTRACK_PT= SUMTREE((211 == ABSID)|(-211 == ABSID)|(321 == ABSID)|(-321 == ABSID)|(2212 == ABSID)|(-2212 == ABSID),PT)',
     'SUM_PCHI2= SUMTREE((211 == ABSID)|(-211 == ABSID)|(321 == ABSID)|(-321 == ABSID)|(2212 == ABSID)|(-2212 == ABSID),TRPCHI2)'
     ]
-Lambda_b0_hybrid.Preambulo=preamble
+Lb_hybrid.Preambulo=preamble
 
-Lambda_b0_hybrid.Variables = {
+Lb_hybrid.Variables = {
     'max_pt_track' : 'TRACK_MAX_PT',
     'min_pt_track' : 'TRACK_MIN_PT',
     'sum_track_pt' : 'SUMTRACK_PT',
     'sum_pchi2' : 'SUM_PCHI2',
     'n_highpt_tracks' : 'NINTREE(ISBASIC & HASTRACK & (PT>250.0*MeV))',
-    'eta' :'ETA'
+    'ETA':'ETA'
     }
 
-proton_hybrid.Variables ={
-    'eta': 'ETA'
- }
-
-Kminus_hybrid.Variables ={
-    'eta': 'ETA'
- }
-
-eta_hybrid.Variables ={
+Proton_hybrid.Variables ={
     'branch_mass':'MM',
-    'eta': 'ETA'
+    'ETA': 'ETA'
+ }
+
+Kaon_hybrid.Variables ={
+    'branch_mass':'MM',
+    'ETA': 'ETA'
+    }
+
+eta_prime_hybrid.Variables ={
+    'ETA': 'ETA'
     }
 
 piminus_hybrid.Variables ={
-    'eta': 'ETA'
+    'ETA': 'ETA'
     }
 
 piplus_hybrid.Variables ={
-    'eta': 'ETA'
+    'ETA': 'ETA'
     }
 
 gamma_hybrid.Variables = {
-    'eta':'ETA'
-    }
-gamma0_hybrid.Variables = {
-    'eta':'ETA'
-    }
-pi0_hybrid.Variables = {
-    'eta':'ETA'
+    'ETA':'ETA'
     }
 
-########MASS SUBSTITUTIONS#########
-
+#==============================MassSubs=====================================
 from Configurables import TupleToolSubMass
 
 tuple.Lambda_b0.addTool(TupleToolSubMass)
@@ -216,26 +213,22 @@ tuple.Lambda_b0.TupleToolSubMass.Substitution += ["K- => pi-"]
 tuple.Lambda_b0.TupleToolSubMass.Substitution += ["K- => p~-"]
 tuple.Lambda_b0.TupleToolSubMass.Substitution += ["pi+ => p+"]
 tuple.Lambda_b0.TupleToolSubMass.Substitution += ["pi+ => K+"]
-tuple.Lambda_b0.TupleToolSubMass.Substitution += ["pi- => K-"]
 tuple.Lambda_b0.TupleToolSubMass.Substitution += ["pi- => p~-"]
-tuple.Lambda_b0.TupleToolSubMass.Substitution += ["gamma => pi0"]
+tuple.Lambda_b0.TupleToolSubMass.Substitution += ["pi- => K-"]
 tuple.Lambda_b0.TupleToolSubMass.Substitution += ["gamma => e-"]
 tuple.Lambda_b0.TupleToolSubMass.Substitution += ["gamma => e+"]
-tuple.Lambda_b0.TupleToolSubMass.Substitution += ["pi- => mu-"]
 tuple.Lambda_b0.TupleToolSubMass.Substitution += ["pi+ => mu+"]
-tuple.Lambda_b0.TupleToolSubMass.Substitution += ["pi0 => eta"]
-tuple.Lambda_b0.TupleToolSubMass.DoubleSubstitution += ["K-/p+ => p~-/K+"]
+tuple.Lambda_b0.TupleToolSubMass.Substitution += ["pi- => mu-"]
+tuple.Lambda_b0.TupleToolSubMass.DoubleSubstitution += ["K+/pi- => pi+/K-"]
 tuple.Lambda_b0.TupleToolSubMass.DoubleSubstitution += ["pi+/pi- => pi-/pi+"]
 tuple.Lambda_b0.TupleToolSubMass.DoubleSubstitution += ["pi+/pi- => mu+/mu-"]
 
 
+#==============================TRIGGER DECISIONS==============================
 
-#==============================TRIGGER DECISIONS==============================-
-
-                 
 
 from Configurables import TupleToolTISTOS
-tistos=tuple.Lambda_b0.addTupleTool(TupleToolTISTOS, name="TupleToolTISTOS")
+tistos = tuple.Lambda_b0.addTupleTool(TupleToolTISTOS, name="TupleToolTISTOS")
 tistos.VerboseL0=True
 tistos.VerboseHlt1=True
 tistos.VerboseHlt2=True
@@ -262,12 +255,11 @@ tistos.TriggerList=["L0PhotonDecision",
                     "Hlt2Topo3BodySimpleDecision",
                     "Hlt2Topo4BodySimpleDecision"]
 
-
 from Configurables import TupleToolL0Calo
 
-tuple.Kminus.addTool(TupleToolL0Calo,name="KminusL0Calo")
-tuple.Kminus.ToolList += ["TupleToolL0Calo/KminusL0Calo"]
-tuple.Kminus.KminusL0Calo.WhichCalo="HCAL"
+tuple.Kaon.addTool(TupleToolL0Calo,name="KaonL0Calo")
+tuple.Kaon.ToolList += ["TupleToolL0Calo/KaonL0Calo"]
+tuple.Kaon.KaonL0Calo.WhichCalo="HCAL"
 
 tuple.piplus.addTool(TupleToolL0Calo,name="piplusL0Calo")
 tuple.piplus.ToolList += ["TupleToolL0Calo/piplusL0Calo"]
@@ -277,9 +269,9 @@ tuple.piminus.addTool(TupleToolL0Calo,name="piminusL0Calo")
 tuple.piminus.ToolList += ["TupleToolL0Calo/piminusL0Calo"]
 tuple.piminus.piminusL0Calo.WhichCalo="HCAL"
 
-tuple.proton.addTool(TupleToolL0Calo,name="protonL0Calo")
-tuple.proton.ToolList += ["TupleToolL0Calo/protonL0Calo"]
-tuple.proton.protonL0Calo.WhichCalo="HCAL"
+tuple.Proton.addTool(TupleToolL0Calo,name="ProtonL0Calo")
+tuple.Proton.ToolList += ["TupleToolL0Calo/ProtonL0Calo"]
+tuple.Proton.ProtonL0Calo.WhichCalo="HCAL"
 
 etuple=EventTuple()
 etuple.ToolList=["TupleToolEventInfo"]
@@ -288,7 +280,7 @@ from Configurables import MCDecayTreeTuple
 mctuple=MCDecayTreeTuple("mctuple")
 mctuple.ToolList+=["MCTupleToolKinematic","MCTupleToolReconstructed","MCTupleToolHierarchy","MCTupleToolDecayType","MCTupleToolPID"]
 
-mctuple.Decay="[Lambda_b0 -> ^p+ ^K- ^(eta -> ^pi+ ^pi- ^(pi0 -> ^gamma ^gamma))]CC"
+mctuple.Decay="[Lambda_b0 -> ^p+ ^K- ^(eta_prime -> ^pi+ ^pi- ^gamma)]CC"
 
 
 MySequencer.Members.append(etuple)
