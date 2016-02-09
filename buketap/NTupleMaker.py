@@ -119,7 +119,7 @@ from Configurables import TupleToolL0Calo
 from DecayTreeTuple.Configuration import *
 tuple=DecayTreeTuple()
 tuple.Decay="[B+ -> ^K+ ^(eta_prime -> ^(rho(770)0 -> ^pi+ ^pi-) ^gamma)]CC"
-tuple.addBranches({'Bu':"[B+ -> ^K+ ^(eta_prime -> ^(rho(770)0 -> ^pi+ ^pi-) ^gamma)]CC"})
+tuple.addBranches({'Bu':"[B+ -> K+ (eta_prime -> (rho(770)0 -> pi+ pi-) gamma)]CC"})
 tuple.Inputs=[Buseq.outputLocation()]
 tuple.addTool(TupleToolL0Calo())
 tuple.TupleToolL0Calo.TriggerClusterLocation="/Event/Trig/L0/Calo"
@@ -161,9 +161,9 @@ tuple.Bu.DTF.constrainToOriginVertex=True
 
 #===========================REFIT WITH JUST PV CONSTRAINED======================
 tuple.Bu.addTupleTool('TupleToolDecayTreeFitter/DTFEtapFixed')
-tuple.Bu.DTF.daughtersToConstrain = ["eta_prime"]
-tuple.Bu.DTF.Verbose=True
-tuple.Bu.DTF.constrainToOriginVertex=True
+tuple.Bu.DTFEtapFixed.daughtersToConstrain = ["eta_prime"]
+tuple.Bu.DTFEtapFixed.Verbose=True
+tuple.Bu.DTFEtapFixed.constrainToOriginVertex=True
 
 #==============================REFIT WITH K SWAPPED FOR PI ALL CONSTRAINED ==============================
 tuple.Bu.addTupleTool('TupleToolDecayTreeFitter/DTFKforpi')
@@ -362,7 +362,7 @@ from GaudiConf import IOHelper
 
 # Use the local input data
 IOHelper().inputFiles([
-    '../00046511_00000002_2.AllStreams.dst'
+    './00046511_00000002_2.AllStreams.dst'
     ], clear=True)
 
 
