@@ -52,6 +52,8 @@ from PhysSelPython.Wrappers import SelectionSequence
 from PhysSelPython.Wrappers import DataOnDemand
 
 from Configurables import CombineParticles, FilterDesktop
+from StandardParticles import StdLoosePions
+
 stream='AllStreams'
 line='BetaSQ2B3piSelectionLine'
 tesLoc='/Event/{0}/Phys/{1}/Particles'.format(stream,line)
@@ -59,19 +61,19 @@ tesLoc='/Event/{0}/Phys/{1}/Particles'.format(stream,line)
 rhooutput=DataOnDemand(Location='Phys/DiTracksForCharmlessBBetaSQ2B/Particles')
 
 rhofilter=FilterDesktop('rhofilter',
-			Code = 'PT>700*MeV'
+			Code = 'MM>300'
 			)
 
 rhoselection = Selection(name  = 'rhoselection',
 			 Algorithm = rhofilter,
-			 RequiredSelections=[rhooutput]
+			 RequiredSelections=[rhooutput,StdLoosePions]
 			 )
 
 
 stdloosephotons = DataOnDemand('Phys/StdLooseAllPhotons/Particles')
 
 photonfilter = FilterDesktop('photonfilter',
-			     Code = 'PT> 250*MeV',
+			     Code = 'PT> 500*MeV',
 			     )
 
 photonselection= Selection(name= 'gammaselection',
@@ -79,9 +81,9 @@ photonselection= Selection(name= 'gammaselection',
 			   RequiredSelections= [stdloosephotons])
 
 makeeta_prime= CombineParticles('makeeta_prime',
-				DecayDescriptor="[eta_prime -> rho(770)0 gamma]cc",
-				CombinationCut = "(AM >800)",
-				MotherCut= "(VFASPF(VCHI2/VDOF)<10.0)")
+				DecayDescriptor="eta_prime -> rho(770)0 gamma",
+				CombinationCut = "(AM > 880.0) & (AM<1040) & (AP > 4000) & (APT > 1500)",
+				MotherCut= "(VFASPF(VCHI2/VDOF)<9.0)")
 
 eta_primesel= Selection(name="eta_primesel",
 			Algorithm = makeeta_prime,
@@ -89,10 +91,17 @@ eta_primesel= Selection(name="eta_primesel",
 
 stdKaons = DataOnDemand("Phys/StdLooseKaons/Particles")
 
+#FilteredKaons = FilterDesktop('FilteredKaons',
+#			      Code = 'PT>1200')
+
+#FilteredKaonsSel = Selection(name="FilteredKaonsSel",
+#			     Algorithm= FilteredKaons,
+#x			     RequiredSelections =[stdKaons])
+
 makeBu= CombineParticles('makeBu',
 			 DecayDescriptor="[B+ -> eta_prime K+]cc",
-			 CombinationCut ="(AM > 4500) & (AM < 6500)",
-			 MotherCut = "(VFASPF(VCHI2/VDOF)<9.0)",
+			 CombinationCut ="(AM > 4900) & (AM < 5600) & (APT > 1500) & ACUTDOCA(0.04*mm,'')",
+			 MotherCut = "(VFASPF(VCHI2/VDOF)<6.0)",
 			 )
 
 BuSel = Selection('BuSel',
@@ -102,57 +111,20 @@ BuSel = Selection('BuSel',
 Buseq = SelectionSequence('Buseq',
 			  TopSelection= BuSel)
 		
-# Build an Eta_prime
-
-#eta_prime_daughters = {
-#	'pi+' : '(PT > 200*MeV)',
-#	'pi-' : '(PT> 200*MeV)',
-#	'gamma' : '(PT>400*MeV)'
-#	}
-
-
-#CombEta_prime = CombineParticles('CombEta_prime',
-#				 Inputs= ['Phys/StdAllLoosePions/Particles','Phys/StdLooseAllPhotons/Particles',StrippingSels.outputLocation()],
-#				 DecayDescriptor = 'eta_prime -> rho(770)0 gamma',
-#				 DaughtersCuts=eta_prime_daughters,
-#				 CombinationCut='(APT>1200*MeV)',
-#				 MotherCut = '(VFASPF(VCHI2/VDOF)<10.0)')
-
-#etapsel=Selection('etapsel', Algorithm=CombEta_prime,RequiredSelections=[StdAllLoosePions,StdLooseAllPhotons,StrippingSels])
-
-#Bu_daughters = {
-#	'K+' : '(PT>1000*MeV)'
-#	}
-
-#BuComb=CombineParticles('BuComb',
-#			Inputs=[etapsel.outputLocation(),'Phys/StdAllLooseKaons/Particles'],
-#			DecayDescriptor ='B+ -> K+ eta_prime',
-#			DaughtersCuts = Bu_daughters,
-#			CombinationCut= "in_range(4500,AM,5600)",
-#			MotherCut = '(VFASPF(VCHI2/VDOF) <10.0)'
-#			)
-
-#BuSel=Selection('BuSel',
-#	       Algorithm=BuComb,
-#	       RequiredSelections=[StdAllLooseKaons,etapsel])
-
-#BuSelSeq = SelectionSequence('BuSelSeq',TopSelection=BuSel)
-			
-			
-
-#Bu_seq=SelectionSequence('Bu_seq',TopSelection=Bu_sel)
-
 #from SelPy.graph import graph
 #graph(Bu_sel, format='png')
 
 from Configurables import DecayTreeTuple
+from Configurables import TupleToolL0Calo
 from DecayTreeTuple.Configuration import *
 tuple=DecayTreeTuple()
 tuple.Decay="[B+ -> ^K+ ^(eta_prime -> ^(rho(770)0 -> ^pi+ ^pi-) ^gamma)]CC"
-#tuple.Decay="[B+ -> ^(rho(770)0 -> ^pi+ ^pi-) ^pi+]CC"
-#tuple.Branches={"Bu":"[B+ -> (rho(770)0 -> pi+ pi-) pi+]CC"}
-#tuple.Inputs=['Phys/{0}/Particles'.format(line)]
+tuple.addBranches({'Bu':"[B+ -> ^K+ ^(eta_prime -> ^(rho(770)0 -> ^pi+ ^pi-) ^gamma)]CC"})
 tuple.Inputs=[Buseq.outputLocation()]
+tuple.addTool(TupleToolL0Calo())
+tuple.TupleToolL0Calo.TriggerClusterLocation="/Event/Trig/L0/Calo"
+tuple.TupleToolL0Calo.WhichCalo="HCAL"
+
 
 tuple.ToolList += [
     "TupleToolGeometry"
@@ -173,14 +145,127 @@ tuple.ToolList += [
     , "TupleToolTrackIsolation"
     ]
 
-tuple.addTool(TupleToolDecay,name="Bu")
+from Configurables import TupleToolDecay
+tuple.addTool(TupleToolDecay,name="B+")
+tuple.addTool(TupleToolDecay,name="eta_prime")
+
+
+
 
 from Configurables import TupleToolDecayTreeFitter
 
-#===========================REFIT WITH DAUGHTERS AND PV CONSTRAINED======================
-#tuple.Bu.addTupleTool('TupleToolDecayTreeFitter/DTF')
-#tuple.Bu.DTF.Verbose=True
-#tuple.Bu.DTF.constrainToOriginVertex=True
+#===========================REFIT WITH JUST PV CONSTRAINED======================
+tuple.Bu.addTupleTool('TupleToolDecayTreeFitter/DTF')
+tuple.Bu.DTF.Verbose=True
+tuple.Bu.DTF.constrainToOriginVertex=True
+
+#===========================REFIT WITH JUST PV CONSTRAINED======================
+tuple.Bu.addTupleTool('TupleToolDecayTreeFitter/DTFEtapFixed')
+tuple.Bu.DTF.daughtersToConstrain = ["eta_prime"]
+tuple.Bu.DTF.Verbose=True
+tuple.Bu.DTF.constrainToOriginVertex=True
+
+#==============================REFIT WITH K SWAPPED FOR PI ALL CONSTRAINED ==============================
+tuple.Bu.addTupleTool('TupleToolDecayTreeFitter/DTFKforpi')
+tuple.Bu.DTFKforpi.Verbose=True
+tuple.Bu.DTFKforpi.constrainToOriginVertex=True
+tuple.Bu.DTFKforpi.daughtersToConstrain = ["eta_prime"]
+tuple.Bu.DTFKforpi.Substitutions={
+	"B+ -> ^K+ (eta_prime -> (rho(770)0 -> pi- pi+) gamma)" : "pi+",
+	"B- -> ^K- (eta_prime -> (rho(770)0 -> pi- pi+) gamma)" : "pi-",
+	    }
+
+########################################=LOKI FUNCTOR VARIABLES===============================================
+
+tuple.addBranches({ 'Kaon' : '[B+ -> ^K+ (eta_prime -> (rho(770)0 -> pi+ pi-) gamma)]CC',
+		    'eta_prime' : '[B+ -> K+ ^(eta_prime -> (rho(770)0 -> pi+ pi-) gamma)]CC',
+		    'piminus' : '[B+ -> K+ (eta_prime -> (rho(770)0 -> pi+ ^pi-) gamma)]CC',
+		    'piplus' : '[B+ -> K+ (eta_prime -> (rho(770)0 -> ^pi+ pi-) gamma)]CC',
+		    'gamma' : '[B+ -> K+ (eta_prime -> (rho(770)0 ->pi+ pi-) ^gamma)]CC',
+		    'rho' : '[B+ -> K+ (eta_prime -> ^(rho(770)0 ->pi+ pi-) gamma)]CC',
+		                      })
+
+from Configurables import TupleToolMCBackgroundInfo
+tuple.Bu.addTool( TupleToolMCBackgroundInfo )
+tuple.Bu.ToolList += [ "TupleToolMCBackgroundInfo" ]
+
+from LoKiPhys.decorators import MAXTREE,MINTREE,ISBASIC,HASTRACK,SUMTREE,PT,ABSID,NINTREE,ETA,TRPCHI2
+
+#eventtupletool=tuple.addTupleTool('LoKi::Hybrid::EventTupleTool/ETT')
+#eventtupletool.VOID_Variables = {
+#    "nTracks" : "TrSOURCE('Rec/Track/Best') >> TrSIZE"
+ #   ,"nPVs"   : "CONTAINS('Rec/Vertex/Primary')"
+   #   }
+
+Bu_hybrid=tuple.Bu.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_Bu')
+Kaon_hybrid=tuple.Kaon.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_Kaon')
+eta_prime_hybrid=tuple.eta_prime.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_eta_prime')
+piminus_hybrid=tuple.piminus.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_piminus')
+piplus_hybrid=tuple.piplus.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_piplus')
+gamma_hybrid=tuple.gamma.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_gamma')
+rho_hybrid=tuple.rho.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_rho')
+
+preamble=[
+	'TRACK_MAX_PT= MAXTREE(PT, ISBASIC & HASTRACK, -666)',
+	'TRACK_MIN_PT= MINTREE(PT, ISBASIC & HASTRACK)',
+	'SUMTRACK_PT= SUMTREE((211 == ABSID)|(-211 == ABSID)|(321 == ABSID)|(-321 == ABSID)|(2212 == ABSID)|(-2212 == ABSID),PT)',
+	'SUM_PCHI2= SUMTREE((211 == ABSID)|(-211 == ABSID)|(321 == ABSID)|(-321 == ABSID)|(2212 == ABSID)|(-2212 == ABSID),TRPCHI2)',
+	]
+Bu_hybrid.Preambulo=preamble
+
+Bu_hybrid.Variables = {
+	'max_pt_track' : 'TRACK_MAX_PT',
+	'min_pt_track' : 'TRACK_MIN_PT',
+	'sum_track_pt' : 'SUMTRACK_PT',
+	'sum_pchi2' : 'SUM_PCHI2',
+	'n_highpt_tracks' : 'NINTREE(ISBASIC & HASTRACK & (PT>250.0*MeV))',
+	'ETA':'ETA'
+	}
+
+Kaon_hybrid.Variables ={
+	'Mass':'MM',
+	'ETA': 'ETA'
+	}
+
+eta_prime_hybrid.Variables ={
+	'ETA': 'ETA'
+	}
+
+piminus_hybrid.Variables ={
+	'ETA': 'ETA'
+	}
+
+piplus_hybrid.Variables ={
+	'ETA': 'ETA'
+	}
+
+gamma_hybrid.Variables = {
+	'ETA':'ETA'
+	}
+rho_hybrid.Variables = {
+	'Mass' : 'MM',
+	'ETA' : 'ETA'
+	}
+
+#==============================MassSubs=====================================
+from Configurables import TupleToolSubMass
+
+tuple.Bu.addTool(TupleToolSubMass)
+tuple.Bu.ToolList += ["TupleToolSubMass"]
+tuple.Bu.TupleToolSubMass.Substitution += ["K+ => pi+"]
+tuple.Bu.TupleToolSubMass.Substitution += ["K+ => p+"]
+tuple.Bu.TupleToolSubMass.Substitution += ["pi+ => p+"]
+tuple.Bu.TupleToolSubMass.Substitution += ["pi+ => K+"]
+tuple.Bu.TupleToolSubMass.Substitution += ["pi- => p~-"]
+tuple.Bu.TupleToolSubMass.Substitution += ["pi- => K-"]
+tuple.Bu.TupleToolSubMass.Substitution += ["gamma => e-"]
+tuple.Bu.TupleToolSubMass.Substitution += ["gamma => e+"]
+tuple.Bu.TupleToolSubMass.Substitution += ["pi+ => mu+"]
+tuple.Bu.TupleToolSubMass.Substitution += ["pi- => mu-"]
+tuple.Bu.TupleToolSubMass.DoubleSubstitution += ["K+/pi- => pi+/K-"]
+tuple.Bu.TupleToolSubMass.DoubleSubstitution += ["pi+/pi- => pi-/pi+"]
+tuple.Bu.TupleToolSubMass.DoubleSubstitution += ["pi+/pi- => mu+/mu-"]
+
 
 #==============================TRIGGER DECISIONS==============================
 
@@ -213,16 +298,60 @@ tistos.TriggerList=["L0PhotonDecision",
                     "Hlt2Topo3BodySimpleDecision",
                     "Hlt2Topo4BodySimpleDecision"]
 
+from Configurables import TupleToolMCTruth
+tuple.addTool(TupleToolMCTruth)
+tuple.ToolList += ["TupleToolMCTruth"]
+tuple.TupleToolMCTruth.ToolList += [
+	"MCTupleToolHierarchy",
+	"MCTupleToolKinematic",
+	#    "MCTupleToolDecayType",
+	#   "MCTupleToolReconstructed",
+	#  "MCTupleToolPID",
+	# "MCTupleToolP2VV",
+	#    "MCTupleToolAngles",
+	#    "MCTupleToolInteractions",
+	#   "MCTupleToolPrimaries",
+	#  "MCTupleToolPrompt"
+	]
+
+from Configurables import TupleToolL0Calo
+
+tuple.Kaon.addTool(TupleToolL0Calo,name="KaonL0Calo")
+tuple.Kaon.ToolList += ["TupleToolL0Calo/KaonL0Calo"]
+tuple.Kaon.KaonL0Calo.WhichCalo="HCAL"
+
+tuple.piplus.addTool(TupleToolL0Calo,name="piplusL0Calo")
+tuple.piplus.ToolList += ["TupleToolL0Calo/piplusL0Calo"]
+tuple.piplus.piplusL0Calo.WhichCalo="HCAL"
+
+tuple.piminus.addTool(TupleToolL0Calo,name="piminusL0Calo")
+tuple.piminus.ToolList += ["TupleToolL0Calo/piminusL0Calo"]
+tuple.piminus.piminusL0Calo.WhichCalo="HCAL"
+
+etuple=EventTuple()
+etuple.ToolList=["TupleToolEventInfo"]
+
+from Configurables import MCDecayTreeTuple
+mctuple=MCDecayTreeTuple("mctuple")
+mctuple.ToolList+=["MCTupleToolKinematic","MCTupleToolReconstructed","MCTupleToolHierarchy","MCTupleToolDecayType","MCTupleToolPID"]
+
+mctuple.Decay="[B+ -> ^K+ ^(eta_prime -> ^(rho(770)0 -> ^pi+ ^pi-) ^gamma)]CC"
+
+
+
 Gseq=GaudiSequencer('MyTupleSeq')
 Gseq.Members += [Buseq.sequence()]
+Gseq.Members.append(etuple)
 Gseq.Members += [tuple]
+Gseq.Members.append(mctuple)
+
 DaVinci().InputType='DST'
 DaVinci().appendToMainSequence([Gseq])
 #DaVinci().UserAlgorithms+=[tuple]
 DaVinci().TupleFile="Output.root"
 DaVinci().HistogramFile="histos.root"
 DaVinci().DataType='2012'
-DaVinci().EvtMax=5000
+DaVinci().EvtMax=500
 DaVinci().PrintFreq=1000
 DaVinci().MoniSequence=[tuple]
 DaVinci().Simulation=True
@@ -233,7 +362,7 @@ from GaudiConf import IOHelper
 
 # Use the local input data
 IOHelper().inputFiles([
-    '00046511_00000002_2.AllStreams.dst'
+    '../00046511_00000002_2.AllStreams.dst'
     ], clear=True)
 
 
