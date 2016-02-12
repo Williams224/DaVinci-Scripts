@@ -1,7 +1,7 @@
 import datetime as dt
 import time
 
-finishtime=dt.datetime(2015,11,26,8,00)
+finishtime=dt.datetime(2015,12,8,7,00)
 #s=True
 while dt.datetime.now()<finishtime:
 #while s is True:
@@ -10,11 +10,11 @@ while dt.datetime.now()<finishtime:
  #       if i not in range(474,477):
   #          MopUpFails(i)
    #         GetOutput(i)
-   MopUpFails(536)
-   MopUpFails(537)
-   GetOutput(536)
-   GetOutput(537)
-   time.sleep(600)
+   MopUpFails(544)
+   MopUpFails(545)
+   GetOutput(544)
+   GetOutput(545)
+   time.sleep(60)
    
 #MopUpFails(532)
 #MopUpFails(533)

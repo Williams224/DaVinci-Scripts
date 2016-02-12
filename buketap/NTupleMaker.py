@@ -1,4 +1,5 @@
 from Gaudi.Configuration import *
+from GaudiKernel.SystemOfUnits import *
 from Configurables import DaVinci
 from Configurables import GaudiSequencer
 
@@ -61,19 +62,19 @@ tesLoc='/Event/{0}/Phys/{1}/Particles'.format(stream,line)
 rhooutput=DataOnDemand(Location='Phys/DiTracksForCharmlessBBetaSQ2B/Particles')
 
 rhofilter=FilterDesktop('rhofilter',
-			Code = 'MM>300'
+			Code = 'MM>100.0*MeV'
 			)
 
 rhoselection = Selection(name  = 'rhoselection',
 			 Algorithm = rhofilter,
-			 RequiredSelections=[rhooutput,StdLoosePions]
+			 RequiredSelections=[rhooutput]
 			 )
 
 
 stdloosephotons = DataOnDemand('Phys/StdLooseAllPhotons/Particles')
 
 photonfilter = FilterDesktop('photonfilter',
-			     Code = 'PT> 500*MeV',
+			     Code = 'PT> 500.0*MeV',
 			     )
 
 photonselection= Selection(name= 'gammaselection',
@@ -82,7 +83,7 @@ photonselection= Selection(name= 'gammaselection',
 
 makeeta_prime= CombineParticles('makeeta_prime',
 				DecayDescriptor="eta_prime -> rho(770)0 gamma",
-				CombinationCut = "(AM > 880.0) & (AM<1040) & (AP > 4000) & (APT > 1500)",
+				CombinationCut = "(AM > 880.0) & (AM<1040.0) & (AP > 4000.0) & (APT > 1500.0)",
 				MotherCut= "(VFASPF(VCHI2/VDOF)<9.0)")
 
 eta_primesel= Selection(name="eta_primesel",
@@ -112,14 +113,14 @@ Buseq = SelectionSequence('Buseq',
 			  TopSelection= BuSel)
 		
 #from SelPy.graph import graph
-#graph(Bu_sel, format='png')
+#graph(BuSel, format='png')
 
 from Configurables import DecayTreeTuple
 from Configurables import TupleToolL0Calo
 from DecayTreeTuple.Configuration import *
 tuple=DecayTreeTuple()
-tuple.Decay="[B+ -> ^K+ ^(eta_prime -> ^(rho(770)0 -> ^pi+ ^pi-) ^gamma)]CC"
-tuple.addBranches({'Bu':"[B+ -> K+ (eta_prime -> (rho(770)0 -> pi+ pi-) gamma)]CC"})
+tuple.Decay="[[B+]cc -> ^K+ ^(eta_prime -> ^(rho(770)0 -> ^pi+ ^pi-) ^gamma)]CC"
+tuple.addBranches({'Bu':"[[B+]cc -> K+ (eta_prime -> (rho(770)0 -> pi+ pi-) gamma)]CC"})
 tuple.Inputs=[Buseq.outputLocation()]
 tuple.addTool(TupleToolL0Calo())
 tuple.TupleToolL0Calo.TriggerClusterLocation="/Event/Trig/L0/Calo"
@@ -177,12 +178,12 @@ tuple.Bu.DTFKforpi.Substitutions={
 
 ########################################=LOKI FUNCTOR VARIABLES===============================================
 
-tuple.addBranches({ 'Kaon' : '[B+ -> ^K+ (eta_prime -> (rho(770)0 -> pi+ pi-) gamma)]CC',
-		    'eta_prime' : '[B+ -> K+ ^(eta_prime -> (rho(770)0 -> pi+ pi-) gamma)]CC',
-		    'piminus' : '[B+ -> K+ (eta_prime -> (rho(770)0 -> pi+ ^pi-) gamma)]CC',
-		    'piplus' : '[B+ -> K+ (eta_prime -> (rho(770)0 -> ^pi+ pi-) gamma)]CC',
-		    'gamma' : '[B+ -> K+ (eta_prime -> (rho(770)0 ->pi+ pi-) ^gamma)]CC',
-		    'rho' : '[B+ -> K+ (eta_prime -> ^(rho(770)0 ->pi+ pi-) gamma)]CC',
+tuple.addBranches({ 'Kaon' : '[[B+]cc -> ^K+ (eta_prime -> (rho(770)0 -> pi+ pi-) gamma)]CC',
+		    'eta_prime' : '[[B+]cc -> K+ ^(eta_prime -> (rho(770)0 -> pi+ pi-) gamma)]CC',
+		    'piminus' : '[[B+]cc -> K+ (eta_prime -> (rho(770)0 -> pi+ ^pi-) gamma)]CC',
+		    'piplus' : '[[B+]cc -> K+ (eta_prime -> (rho(770)0 -> ^pi+ pi-) gamma)]CC',
+		    'gamma' : '[[B+]cc -> K+ (eta_prime -> (rho(770)0 ->pi+ pi-) ^gamma)]CC',
+		    'rho' : '[[B+]cc -> K+ (eta_prime -> ^(rho(770)0 ->pi+ pi-) gamma)]CC',
 		                      })
 
 from Configurables import TupleToolMCBackgroundInfo
@@ -335,7 +336,7 @@ from Configurables import MCDecayTreeTuple
 mctuple=MCDecayTreeTuple("mctuple")
 mctuple.ToolList+=["MCTupleToolKinematic","MCTupleToolReconstructed","MCTupleToolHierarchy","MCTupleToolDecayType","MCTupleToolPID"]
 
-mctuple.Decay="[B+ -> ^K+ ^(eta_prime -> ^(rho(770)0 -> ^pi+ ^pi-) ^gamma)]CC"
+mctuple.Decay="[[B+]cc -> ^K+ ^(eta_prime -> ^(rho(770)0 -> ^pi+ ^pi-) ^gamma)]CC"
 
 
 
@@ -346,12 +347,12 @@ Gseq.Members += [tuple]
 Gseq.Members.append(mctuple)
 
 DaVinci().InputType='DST'
-DaVinci().appendToMainSequence([Gseq])
-#DaVinci().UserAlgorithms+=[tuple]
+#DaVinci().appendToMainSequence([Gseq])
+DaVinci().UserAlgorithms+=[Gseq]
 DaVinci().TupleFile="Output.root"
 DaVinci().HistogramFile="histos.root"
 DaVinci().DataType='2012'
-DaVinci().EvtMax=500
+DaVinci().EvtMax=3000
 DaVinci().PrintFreq=1000
 DaVinci().MoniSequence=[tuple]
 DaVinci().Simulation=True
@@ -362,7 +363,7 @@ from GaudiConf import IOHelper
 
 # Use the local input data
 IOHelper().inputFiles([
-    './00046511_00000002_2.AllStreams.dst'
+    './MC_12_12103211.dst'
     ], clear=True)
 
 

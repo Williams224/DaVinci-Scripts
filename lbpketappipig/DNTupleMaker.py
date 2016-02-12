@@ -220,7 +220,7 @@ DaVinci().RootInTES='/Event/{0}'.format(stream)
 DaVinci().UserAlgorithms+=[tuple]
 DaVinci().TupleFile="Output.root"
 DaVinci().HistogramFile="histos.root"
-DaVinci().DataType='2012'
+DaVinci().DataType='2011'
 DaVinci().EvtMax=-1
 DaVinci().Lumi=True
 DaVinci().PrintFreq=1000
@@ -228,12 +228,12 @@ DaVinci().MoniSequence=[tuple]
 DaVinci().Simulation=False
 
 
-from GaudiConf import IOHelper
+#from GaudiConf import IOHelper
 
 # Use the local input data
-IOHelper().inputFiles([
-    '00041836_00000481_1.bhadron.mdst'
-    ], clear=True)
+#IOHelper().inputFiles([
+ #   '00041836_00000481_1.bhadron.mdst'
+  #  ], clear=True)
 
 
 
