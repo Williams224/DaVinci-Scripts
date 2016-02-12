@@ -59,17 +59,15 @@ stream='AllStreams'
 line='BetaSQ2B3piSelectionLine'
 tesLoc='/Event/{0}/Phys/{1}/Particles'.format(stream,line)
 
-rhooutput=DataOnDemand(Location='Phys/DiTracksForCharmlessBBetaSQ2B/Particles')
+TrackList=DataOnDemand('Phys/TrackListBetaSQ2B/Particles')
 
-rhofilter=FilterDesktop('rhofilter',
-			Code = 'MM>100.0*MeV'
-			)
+PionFilter=FilterDesktop('PionFilter',
+                         Code= 'PT>250.0*MeV',
+                         )
 
-rhoselection = Selection(name  = 'rhoselection',
-			 Algorithm = rhofilter,
-			 RequiredSelections=[rhooutput]
-			 )
-
+PionSelection = Selection(name= 'PionSelection',
+                          Algorithm = PionFilter,
+                          RequiredSelections= [TrackList])
 
 stdloosephotons = DataOnDemand('Phys/StdLooseAllPhotons/Particles')
 
@@ -82,13 +80,14 @@ photonselection= Selection(name= 'gammaselection',
 			   RequiredSelections= [stdloosephotons])
 
 makeeta_prime= CombineParticles('makeeta_prime',
-				DecayDescriptor="eta_prime -> rho(770)0 gamma",
-				CombinationCut = "(AM > 880.0) & (AM<1040.0) & (AP > 4000.0) & (APT > 1500.0)",
+				DecayDescriptor="eta_prime -> pi+ pi- gamma",
+				CombinationCut = "(AM > 880.0*MeV) & (AM<1040.0*MeV) & (AP > 4000.0) & (APT > 1500.0)",
+                                DaughtersCuts={'pi+':'ALL','pi-':'ALL','gamma':'ALL'},
 				MotherCut= "(VFASPF(VCHI2/VDOF)<9.0)")
 
 eta_primesel= Selection(name="eta_primesel",
 			Algorithm = makeeta_prime,
-			RequiredSelections= [rhoselection, photonselection])
+			RequiredSelections= [PionSelection, photonselection])
 
 stdKaons = DataOnDemand("Phys/StdLooseKaons/Particles")
 
@@ -101,7 +100,7 @@ stdKaons = DataOnDemand("Phys/StdLooseKaons/Particles")
 
 makeBu= CombineParticles('makeBu',
 			 DecayDescriptor="[B+ -> eta_prime K+]cc",
-			 CombinationCut ="(AM > 4900) & (AM < 5600) & (APT > 1500) & ACUTDOCA(0.04*mm,'')",
+			 CombinationCut ="(AM > 4900) & (AM < 5600) & (APT > 1500) & (AMAXDOCA('') < 0.04*mm)",
 			 MotherCut = "(VFASPF(VCHI2/VDOF)<6.0)",
 			 )
 
@@ -119,8 +118,8 @@ from Configurables import DecayTreeTuple
 from Configurables import TupleToolL0Calo
 from DecayTreeTuple.Configuration import *
 tuple=DecayTreeTuple()
-tuple.Decay="[[B+]cc -> ^K+ ^(eta_prime -> ^(rho(770)0 -> ^pi+ ^pi-) ^gamma)]CC"
-tuple.addBranches({'Bu':"[[B+]cc -> K+ (eta_prime -> (rho(770)0 -> pi+ pi-) gamma)]CC"})
+tuple.Decay="[[B+]cc -> ^K+ ^(eta_prime -> ^pi+ ^pi- ^gamma)]CC"
+tuple.addBranches({'Bu':"[[B+]cc -> K+ (eta_prime -> pi+ pi- gamma)]CC"})
 tuple.Inputs=[Buseq.outputLocation()]
 tuple.addTool(TupleToolL0Calo())
 tuple.TupleToolL0Calo.TriggerClusterLocation="/Event/Trig/L0/Calo"
@@ -167,24 +166,23 @@ tuple.Bu.DTFEtapFixed.Verbose=True
 tuple.Bu.DTFEtapFixed.constrainToOriginVertex=True
 
 #==============================REFIT WITH K SWAPPED FOR PI ALL CONSTRAINED ==============================
-tuple.Bu.addTupleTool('TupleToolDecayTreeFitter/DTFKforpi')
-tuple.Bu.DTFKforpi.Verbose=True
-tuple.Bu.DTFKforpi.constrainToOriginVertex=True
-tuple.Bu.DTFKforpi.daughtersToConstrain = ["eta_prime"]
-tuple.Bu.DTFKforpi.Substitutions={
-	"B+ -> ^K+ (eta_prime -> (rho(770)0 -> pi- pi+) gamma)" : "pi+",
-	"B- -> ^K- (eta_prime -> (rho(770)0 -> pi- pi+) gamma)" : "pi-",
-	    }
+#tuple.Bu.addTupleTool('TupleToolDecayTreeFitter/DTFKforpi')
+#tuple.Bu.DTFKforpi.Verbose=True
+#tuple.Bu.DTFKforpi.constrainToOriginVertex=True
+#tuple.Bu.DTFKforpi.daughtersToConstrain = ["eta_prime"]
+#tuple.Bu.DTFKforpi.Substitutions={
+#	"B+ -> ^K+ (eta_prime -> (rho(770)0 -> pi- pi+) gamma)" : "pi+",
+#	"B- -> ^K- (eta_prime -> (rho(770)0 -> pi- pi+) gamma)" : "pi-",
+#	    }
 
 ########################################=LOKI FUNCTOR VARIABLES===============================================
 
-tuple.addBranches({ 'Kaon' : '[[B+]cc -> ^K+ (eta_prime -> (rho(770)0 -> pi+ pi-) gamma)]CC',
-		    'eta_prime' : '[[B+]cc -> K+ ^(eta_prime -> (rho(770)0 -> pi+ pi-) gamma)]CC',
-		    'piminus' : '[[B+]cc -> K+ (eta_prime -> (rho(770)0 -> pi+ ^pi-) gamma)]CC',
-		    'piplus' : '[[B+]cc -> K+ (eta_prime -> (rho(770)0 -> ^pi+ pi-) gamma)]CC',
-		    'gamma' : '[[B+]cc -> K+ (eta_prime -> (rho(770)0 ->pi+ pi-) ^gamma)]CC',
-		    'rho' : '[[B+]cc -> K+ (eta_prime -> ^(rho(770)0 ->pi+ pi-) gamma)]CC',
-		                      })
+tuple.addBranches({ 'Kaon' : '[[B+]cc -> ^K+ (eta_prime -> pi+ pi- gamma)]CC',
+		    'eta_prime' : '[[B+]cc -> K+ ^(eta_prime -> pi+ pi- gamma)]CC',
+		    'piminus' : '[[B+]cc -> K+ (eta_prime -> pi+ ^pi- gamma)]CC',
+		    'piplus' : '[[B+]cc -> K+ (eta_prime -> ^pi+ pi- gamma)]CC',
+		    'gamma' : '[[B+]cc -> K+ (eta_prime -> pi+ pi- ^gamma)]CC',
+            })
 
 from Configurables import TupleToolMCBackgroundInfo
 tuple.Bu.addTool( TupleToolMCBackgroundInfo )
@@ -204,7 +202,7 @@ eta_prime_hybrid=tuple.eta_prime.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_eta_
 piminus_hybrid=tuple.piminus.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_piminus')
 piplus_hybrid=tuple.piplus.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_piplus')
 gamma_hybrid=tuple.gamma.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_gamma')
-rho_hybrid=tuple.rho.addTupleTool('LoKi::Hybrid::TupleTool/LoKi_rho')
+
 
 preamble=[
 	'TRACK_MAX_PT= MAXTREE(PT, ISBASIC & HASTRACK, -666)',
@@ -242,10 +240,6 @@ piplus_hybrid.Variables ={
 
 gamma_hybrid.Variables = {
 	'ETA':'ETA'
-	}
-rho_hybrid.Variables = {
-	'Mass' : 'MM',
-	'ETA' : 'ETA'
 	}
 
 #==============================MassSubs=====================================
@@ -336,7 +330,7 @@ from Configurables import MCDecayTreeTuple
 mctuple=MCDecayTreeTuple("mctuple")
 mctuple.ToolList+=["MCTupleToolKinematic","MCTupleToolReconstructed","MCTupleToolHierarchy","MCTupleToolDecayType","MCTupleToolPID"]
 
-mctuple.Decay="[[B+]cc -> ^K+ ^(eta_prime -> ^(rho(770)0 -> ^pi+ ^pi-) ^gamma)]CC"
+mctuple.Decay="[[B+]cc -> ^K+ ^(eta_prime -> ^pi+ ^pi- ^gamma)]CC"
 
 
 
