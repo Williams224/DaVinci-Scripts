@@ -50,16 +50,21 @@ if simulation:
 
 from PhysSelPython.Wrappers import Selection
 from PhysSelPython.Wrappers import SelectionSequence
-from PhysSelPython.Wrappers import DataOnDemand
+from PhysSelPython.Wrappers import DataOnDemand, AutomaticData
 
 from Configurables import CombineParticles, FilterDesktop
 from StandardParticles import StdLoosePions
+
+from PhysConf.Filters import LoKi_Filters
+fltrs = LoKi_Filters(
+  STRIP_Code = "HLT_PASS('StrippingBetaSQ2B3piSelectionLineDecision')")
+
 
 stream='AllStreams'
 line='BetaSQ2B3piSelectionLine'
 tesLoc='/Event/{0}/Phys/{1}/Particles'.format(stream,line)
 
-rhooutput=DataOnDemand(Location='Phys/DiTracksForCharmlessBBetaSQ2B/Particles')
+rhooutput=AutomaticData(Location='Phys/DiTracksForCharmlessBBetaSQ2B/Particles')
 
 rhofilter=FilterDesktop('rhofilter',
 			Code = 'MM>100.0*MeV'
@@ -71,7 +76,7 @@ rhoselection = Selection(name  = 'rhoselection',
 			 )
 
 
-stdloosephotons = DataOnDemand('Phys/StdLooseAllPhotons/Particles')
+stdloosephotons = DataOnDemand(Location='Phys/StdLooseAllPhotons/Particles')
 
 photonfilter = FilterDesktop('photonfilter',
 			     Code = 'PT> 500.0*MeV',
@@ -90,7 +95,7 @@ eta_primesel= Selection(name="eta_primesel",
 			Algorithm = makeeta_prime,
 			RequiredSelections= [rhoselection, photonselection])
 
-stdKaons = DataOnDemand("Phys/StdLooseKaons/Particles")
+stdKaons = DataOnDemand(Location="Phys/StdLooseKaons/Particles")
 
 #FilteredKaons = FilterDesktop('FilteredKaons',
 #			      Code = 'PT>1200')
@@ -345,7 +350,7 @@ Gseq.Members += [Buseq.sequence()]
 Gseq.Members.append(etuple)
 Gseq.Members += [tuple]
 Gseq.Members.append(mctuple)
-
+DaVinci().EventPreFilters = fltrs.filters ('Filters')
 DaVinci().InputType='DST'
 #DaVinci().appendToMainSequence([Gseq])
 DaVinci().UserAlgorithms+=[Gseq]
