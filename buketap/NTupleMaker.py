@@ -77,7 +77,7 @@ rho_Sel = Selection("rho_Sel",
 
 rho_Seq = SelectionSequence("rho_Seq",TopSelection = rho_Sel)
 
-pion_list = FilterInTrees('pion_list',Code= "'pi+'==ABSID")
+pion_list = FilterInTrees('pion_list',Code= "('pi+'==ABSID) & (PT>250.0*MeV)")
 
 pion_Sel = Selection("pion_Sel",
                      Algorithm = pion_list,
@@ -130,7 +130,8 @@ preambulo=[
 makeBu= CombineParticles("makeBu",
                          Preambulo=preambulo,
                          DecayDescriptors = ['[B+ -> eta_prime pi+]cc'],
-                         MotherCut ="(IM_rhopi>4200) & (IM_rhopi<6700) & (pi_PT>1000)" 
+                         CombinationCut="(AM>3000.0) & (AM<10000.0) & (ACUTDOCA(0.04*mm,''))",
+                         MotherCut ="(VFASPF(VCHI2/VDOF)<20.0)" 
                          )
 
 Bu_sel = Selection("Bu_sel",
@@ -154,7 +155,7 @@ SubKToPi = SubstitutePID (name = "SubKToPi",
                           )
 BuK_Sel=Selection("BuK_Sel",Algorithm=SubKToPi,RequiredSelections=[Bu_sel])
 
-BuKFilter= FilterDesktop("BuKFilter",Code="(M>4900.0) & (M<5600.0) & (VFASPF(VCHI2/VDOF)<9.0)")
+BuKFilter= FilterDesktop("BuKFilter",Code="(M>4900.0) & (M<5600.0) & (VFASPF(VCHI2/VDOF)<6.0)")
 
 BuKFilteredSel = Selection("BuKFilteredSel",Algorithm=BuKFilter,RequiredSelections=[BuK_Sel])
 
@@ -208,19 +209,21 @@ from Configurables import TupleToolDecayTreeFitter
 
 #===========================REFIT WITH JUST PV CONSTRAINED======================
 tuple.Bu.addTupleTool('TupleToolDecayTreeFitter/DTF')
-tuple.Bu.DTF.Verbose=True
+tuple.Bu.DTF.Verbose=False
 tuple.Bu.DTF.constrainToOriginVertex=True
+tuple.Bu.DTF.UpdateDaughters = True
 
 #===========================REFIT WITH JUST PV CONSTRAINED======================
 tuple.Bu.addTupleTool('TupleToolDecayTreeFitter/DTFEtapFixed')
 tuple.Bu.DTFEtapFixed.daughtersToConstrain = ["eta_prime"]
 tuple.Bu.DTFEtapFixed.Verbose=True
-tuple.Bu.DTFEtapFixed.constrainToOriginVertex=True
+tuple.Bu.DTFEtapFixed.constrainToOriginVertex=False
+tuple.Bu.DTFEtapFixed.UpdateDaughters = True
 
 #==============================REFIT WITH K SWAPPED FOR PI ALL CONSTRAINED ==============================
 tuple.Bu.addTupleTool('TupleToolDecayTreeFitter/DTFKforpi')
 tuple.Bu.DTFKforpi.Verbose=True
-tuple.Bu.DTFKforpi.constrainToOriginVertex=True
+tuple.Bu.DTFKforpi.constrainToOriginVertex=False
 tuple.Bu.DTFKforpi.daughtersToConstrain = ["eta_prime"]
 tuple.Bu.DTFKforpi.Substitutions={
 	"B+ -> ^K+ (eta_prime -> (rho(770)0 -> pi- pi+) gamma)" : "pi+",
