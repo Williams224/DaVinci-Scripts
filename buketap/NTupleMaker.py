@@ -39,14 +39,17 @@ if simulation:
                           AcceptBadEvents = False,
                           BadEventSelection = filterBadEvents,
 			  HDRLocation       =  "SomeNoExistingLocation" )
-        
-        DaVinci().appendToMainSequence([event_node_killer,sc.sequence()])
+
+        from Configurables import StrippingReport
+        sr= StrippingReport(Selections =sc.selections())
+
+        StripSequencer = GaudiSequencer('StripSequencer')
+        StripSequencer.Members= [sc.sequence(),sr]
+        StripSequencer.IgnoreFilterPassed =True
+        DaVinci().appendToMainSequence([event_node_killer,StripSequencer])
                                                                                                             
 
 ############################################################################################
-
-
-
 
 from PhysSelPython.Wrappers import Selection
 from PhysSelPython.Wrappers import SelectionSequence
@@ -59,69 +62,107 @@ from StandardParticles import StdLoosePions
 #fltrs = LoKi_Filters(
  # STRIP_Code = "HLT_PASS('StrippingBetaSQ2B3piSelectionLineDecision')")
 
-
 stream='AllStreams'
 line='BetaSQ2B3piSelectionLine'
-tesLoc='/Event/{0}/Phys/{1}/Particles'.format(stream,line)
+tesLoc='/Event/Phys/{0}/Particles'.format(line)
 
-rhooutput=AutomaticData(Location='Phys/DiTracksForCharmlessBBetaSQ2B/Particles')
+from Configurables import FilterInTrees
 
-rhofilter=FilterDesktop('rhofilter',
-			Code = 'MM>100.0*MeV'
-			)
+rho_list = FilterInTrees( 'rho_list',Code= "'rho(770)0'==ABSID")
 
-rhoselection = Selection(name  = 'rhoselection',
-			 Algorithm = rhofilter,
-			 RequiredSelections=[rhooutput,StdLoosePions]
-			 )
+rho_Sel = Selection("rho_Sel",
+                    Algorithm=rho_list,
+                    RequiredSelections = [AutomaticData(Location=tesLoc)]
+                    )
 
+rho_Seq = SelectionSequence("rho_Seq",TopSelection = rho_Sel)
 
-stdloosephotons = DataOnDemand(Location='Phys/StdLooseAllPhotons/Particles')
+pion_list = FilterInTrees('pion_list',Code= "'pi+'==ABSID")
 
-photonfilter = FilterDesktop('photonfilter',
-			     Code = 'PT> 500.0*MeV',
-			     )
-photonfilter.PropertiesPrint =True
-photonselection= Selection(name= 'gammaselection',
-			   Algorithm = photonfilter,
-			   RequiredSelections= [stdloosephotons])
+pion_Sel = Selection("pion_Sel",
+                     Algorithm = pion_list,
+                     RequiredSelections = [AutomaticData(Location = tesLoc)]
+                     )
 
-makeeta_prime= CombineParticles('makeeta_prime',
-				DecayDescriptor="eta_prime -> rho(770)0 gamma",
-				CombinationCut = "(AM > 880.0) & (AM<1040.0) & (AP > 4000.0) & (APT > 1500.0)",
-				MotherCut= "(VFASPF(VCHI2/VDOF)<9.0)")
-
-eta_primesel= Selection(name="eta_primesel",
-			Algorithm = makeeta_prime,
-			RequiredSelections= [rhoselection, photonselection])
+pion_Seq = SelectionSequence("pion_Seq",TopSelection = pion_Sel)
 
 
-makeeta_prime.ReFitPVs=True
-stdKaons = DataOnDemand(Location="Phys/StdLooseKaons/Particles")
+from StandardParticles import StdLooseAllPhotons
 
-#FilteredKaons = FilterDesktop('FilteredKaons',
-##			      Code = 'ALL')
+PhotonFilter = FilterDesktop("PhotonFilter",Code = "(PT >500.0*MeV)")
 
-#FilteredKaonsSel = Selection(name="FilteredKaonsSel",
-#                            Algorithm= FilteredKaons,
-#			     RequiredSelections =[stdKaons])
-
-
-makeBu= CombineParticles('makeBu',
-			 DecayDescriptor="[B+ -> eta_prime K+]cc",
-			 CombinationCut ="(AM > 4900) & (AM < 5600) & (APT > 1500) & ACUTDOCA(0.04*mm,'')",
-			 MotherCut = "(VFASPF(VCHI2/VDOF)<6.0)",
-			 )
-
-BuSel = Selection('BuSel',
-		  Algorithm=makeBu,
-		  RequiredSelections = [eta_primesel,stdKaons])
+PhotonSel = Selection("PhotonSel",
+                      Algorithm=PhotonFilter,
+                      RequiredSelections=[StdLooseAllPhotons]
+                      )
 
 
-makeBu.ReFitPVs =True
-Buseq = SelectionSequence('Buseq',
-			  TopSelection= BuSel)
-		
+
+make_etap = CombineParticles ("make_etap",
+                              DecayDescriptor= "eta_prime -> rho(770)0 gamma",
+                              CombinationCut = "(AM >880.0) &(AM<1040.0) & (AP >4000.0) &(APT>1500.0)",
+                              MotherCut = "(VFASPF(VCHI2/VDOF)<9.0)"
+                              )
+
+etap_selection = Selection("etap_selection",
+                           Algorithm= make_etap,
+                           RequiredSelections=[PhotonSel,rho_Sel]
+                           )
+
+preambulo=[
+"rho_px= CHILD (PX,1,1 ) " ,
+"rho_py=CHILD  (PY,1,1 )" ,
+"rho_pz=CHILD (PZ,1,1 ) ",
+"rho_E= CHILD (E,1,1 ) " ,
+"pi_px= CHILD (PX,2 ) " ,
+"pi_py= CHILD (PY,2 ) " ,
+"pi_pz= CHILD (PZ,2 ) " ,
+"pi_E= CHILD (E,2) " ,
+"pi_PT=CHILD (PT,2) " ,
+"rhopi_px=  rho_px + pi_px",
+"rhopi_py=  rho_py + pi_py",
+"rhopi_pz=  rho_pz + pi_pz",
+"rhopi_E=   rho_E  + pi_E",
+"IM_rhopi = sqrt(rhopi_E**2 - rhopi_px**2 - rhopi_py**2 - rhopi_pz**2)"
+]
+
+
+makeBu= CombineParticles("makeBu",
+                         Preambulo=preambulo,
+                         DecayDescriptors = ['[B+ -> eta_prime pi+]cc'],
+                         MotherCut ="(IM_rhopi>4200) & (IM_rhopi<6700) & (pi_PT>1000)" 
+                         )
+
+Bu_sel = Selection("Bu_sel",
+                   Algorithm= makeBu,
+                   RequiredSelections=[etap_selection,pion_Sel]
+                   )
+
+Bu_selSeq = SelectionSequence("Bu_selSeq",TopSelection=Bu_sel)
+
+from Configurables import PrintDecayTree
+
+pt= PrintDecayTree(Inputs=[Bu_selSeq.outputLocation()])
+
+from Configurables import SubstitutePID
+SubKToPi = SubstitutePID (name = "SubKToPi",
+                          Code = "DECTREE('[(B+ -> eta_prime pi+),(B- -> eta_prime pi-)]')",
+                          Substitutions = {
+                                  'B+ -> eta_prime ^pi+' : 'K+',
+                                  'B- -> eta_prime ^pi-' : 'K-',
+                          }
+                          )
+BuK_Sel=Selection("BuK_Sel",Algorithm=SubKToPi,RequiredSelections=[Bu_sel])
+
+BuKFilter= FilterDesktop("BuKFilter",Code="(M>4900.0) & (M<5600.0) & (VFASPF(VCHI2/VDOF)<9.0)")
+
+BuKFilteredSel = Selection("BuKFilteredSel",Algorithm=BuKFilter,RequiredSelections=[BuK_Sel])
+
+BuKFilteredSel_Seq= SelectionSequence("BuKFilteredSel_Seq",TopSelection=BuKFilteredSel)
+
+
+
+
 #from SelPy.graph import graph
 #graph(BuSel, format='png')
 
@@ -129,9 +170,9 @@ from Configurables import DecayTreeTuple
 from Configurables import TupleToolL0Calo
 from DecayTreeTuple.Configuration import *
 tuple=DecayTreeTuple()
-tuple.Decay="[[B+]cc -> ^K+ ^(eta_prime -> ^(rho(770)0 -> ^pi+ ^pi-) ^gamma)]CC"
-tuple.addBranches({'Bu':"[[B+]cc -> K+ (eta_prime -> (rho(770)0 -> pi+ pi-) gamma)]CC"})
-tuple.Inputs=[Buseq.outputLocation()]
+tuple.Decay="[B+ -> ^K+ ^(eta_prime -> ^(rho(770)0 -> ^pi+ ^pi-) ^gamma)]CC"
+tuple.addBranches({'Bu':"[B+ -> K+ (eta_prime -> (rho(770)0 -> pi+ pi-) gamma)]CC"})
+tuple.Inputs=[BuKFilteredSel_Seq.outputLocation()]
 tuple.addTool(TupleToolL0Calo())
 tuple.TupleToolL0Calo.TriggerClusterLocation="/Event/Trig/L0/Calo"
 tuple.TupleToolL0Calo.WhichCalo="HCAL"
@@ -351,7 +392,7 @@ mctuple.Decay="[[B+]cc -> ^K+ ^(eta_prime -> ^(rho(770)0 -> ^pi+ ^pi-) ^gamma)]C
 
 
 Gseq=GaudiSequencer('MyTupleSeq')
-Gseq.Members += [Buseq.sequence()]
+Gseq.Members += [BuKFilteredSel_Seq.sequence()]
 Gseq.Members.append(etuple)
 Gseq.Members += [tuple]
 Gseq.Members.append(mctuple)
@@ -362,7 +403,7 @@ DaVinci().UserAlgorithms+=[Gseq]
 DaVinci().TupleFile="Output.root"
 DaVinci().HistogramFile="histos.root"
 DaVinci().DataType='2012'
-DaVinci().EvtMax=-1
+DaVinci().EvtMax=3000
 DaVinci().PrintFreq=1000
 DaVinci().MoniSequence=[tuple]
 DaVinci().Simulation=True
