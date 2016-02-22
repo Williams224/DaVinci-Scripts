@@ -228,9 +228,9 @@ tuple.Inputs= [B2EtapKFil_Seq.outputLocation()]
 DaVinci().InputType = 'DST'
 # MC 2012
 DaVinci().DDDBtag =  "dddb-20130929-1"
-DaVinci().CondDBtag= "sim-20130522-1-vc-mu100"
+DaVinci().CondDBtag= "sim-20130522-1-vc-md100"
 DaVinci().DataType = "2012"
-DaVinci().EvtMax = 3000
+DaVinci().EvtMax = 10000
 DaVinci().PrintFreq = 10000
 DaVinci().HistogramFile = "DVHistos.root"
 DaVinci().Simulation = True

@@ -3,52 +3,6 @@ from GaudiKernel.SystemOfUnits import *
 from Configurables import DaVinci
 from Configurables import GaudiSequencer
 
-simulation=True
-
-if simulation:
-        from Configurables import EventNodeKiller
-        from StrippingConf.Configuration import StrippingConf, StrippingStream
-        from StrippingSettings.Utils import strippingConfiguration
-        from StrippingArchive.Utils import buildStreams
-        from StrippingArchive import strippingArchive
-        
-        event_node_killer=EventNodeKiller('StripKiller')
-        event_node_killer.Nodes=['Event/AllStreams','/Event/Strip']
-        
-#        from Configurables import PhysConf
- #       PhysConf().CaloReProcessing=True
-        
-        stripping="stripping20r0p2"
-        config=strippingConfiguration(stripping)
-        archive=strippingArchive(stripping)
-        streams=buildStreams(stripping=config,archive=archive)
-        
-        MyStream= StrippingStream("MyStream")
-        MyLines= ["StrippingBetaSQ2B3piSelectionLine"]
-        
-        for stream in streams:
-            for line in stream.lines:
-                if line.name() in MyLines:
-                    MyStream.appendLines( [ line ])
-                    
-	from Configurables import ProcStatusCheck
-        filterBadEvents=ProcStatusCheck()
-        
-        sc=StrippingConf( Streams= [ MyStream ],
-                          MaxCandidates = 2000,
-                          AcceptBadEvents = False,
-                          BadEventSelection = filterBadEvents,
-			  HDRLocation       =  "SomeNoExistingLocation" )
-
-        from Configurables import StrippingReport
-        sr= StrippingReport(Selections =sc.selections())
-
-        StripSequencer = GaudiSequencer('StripSequencer')
-        StripSequencer.Members= [sc.sequence(),sr]
-        StripSequencer.IgnoreFilterPassed =True
-        DaVinci().appendToMainSequence([event_node_killer,StripSequencer])
-                                                                                                            
-
 ############################################################################################
 
 from PhysSelPython.Wrappers import Selection
@@ -58,13 +12,9 @@ from PhysSelPython.Wrappers import DataOnDemand, AutomaticData
 from Configurables import CombineParticles, FilterDesktop
 from StandardParticles import StdLoosePions
 
-#from PhysConf.Filters import LoKi_Filters
-#fltrs = LoKi_Filters(
- # STRIP_Code = "HLT_PASS('StrippingBetaSQ2B3piSelectionLineDecision')")
-
-stream='AllStreams'
 line='BetaSQ2B3piSelectionLine'
-tesLoc='/Event/Phys/{0}/Particles'.format(line)
+stream='BhadronCompleteEvent'
+tesLoc='/Event/{0}/Phys/{1}/Particles'.format(stream,line)
 
 from Configurables import FilterInTrees
 
@@ -128,34 +78,16 @@ preambulo=[
 
 
 makeBu= CombineParticles("makeBu",
-                        Preambulo=preambulo,
-                       DecayDescriptors = ['[B+ -> eta_prime pi+]cc'],
-                      CombinationCut="(AM>3000.0) & (AM<10000.0)",
-                     MotherCut ="(VFASPF(VCHI2/VDOF)<20.0)" 
-                    )
+                         Preambulo=preambulo,
+                         DecayDescriptors = ['[B+ -> eta_prime pi+]cc'],
+                         CombinationCut="(AM>3000.0) & (AM<10000.0) & (ACUTDOCA(0.04*mm,''))",
+                         MotherCut ="(VFASPF(VCHI2/VDOF)<20.0)" 
+                         )
 
 Bu_sel = Selection("Bu_sel",
-                 Algorithm= makeBu,
-                 RequiredSelections=[etap_selection,pion_Sel]
-                )
-
-
-#KaonList= AutomaticData(Location= 'Phys/StdAllNoPIDsKaons/Particles')
-#from CommonParticles import StdNoPIDsKaons
-#FilteredKaons=FilterDesktop("FilteredKaons",Code="(PT >1200.0*MeV)")
-
-#KaonSel= Selection("KaonSel",Algorithm=FilteredKaons, RequiredSelections=[StdNoPIDsKaons])
-
-#makeBu= CombineParticles("makeBu",
-#			 DecayDescriptors = ['[B+ -> eta_prime K+]cc'],
-#			 CombinationCut="(AM> 3000.0) & (AM<10000.0)",
-#			 MotherCut= "(VFASPF(VCHI2/VDOF)<20.0)"
-#			 )
-
-#Bu_sel = Selection("Bu_sel",
-#		   Algorithm = makeBu,
-#		   RequiredSelections=[etap_selection,pion_Sel,FilteredKaons]
-#		   )
+                   Algorithm= makeBu,
+                   RequiredSelections=[etap_selection,pion_Sel]
+                   )
 
 Bu_selSeq = SelectionSequence("Bu_selSeq",TopSelection=Bu_sel)
 
@@ -165,12 +97,12 @@ pt= PrintDecayTree(Inputs=[Bu_selSeq.outputLocation()])
 
 from Configurables import SubstitutePID
 SubKToPi = SubstitutePID (name = "SubKToPi",
-                         Code = "DECTREE('[(B+ -> eta_prime pi+),(B- -> eta_prime pi-)]')",
+                          Code = "DECTREE('[(B+ -> eta_prime pi+),(B- -> eta_prime pi-)]')",
                           Substitutions = {
-                                'B+ -> eta_prime ^pi+' : 'K+',
+                                  'B+ -> eta_prime ^pi+' : 'K+',
                                   'B- -> eta_prime ^pi-' : 'K-',
                           }
-                         )
+                          )
 BuK_Sel=Selection("BuK_Sel",Algorithm=SubKToPi,RequiredSelections=[Bu_sel])
 
 BuKFilter= FilterDesktop("BuKFilter",Code="(M>4900.0) & (M<5600.0) & (VFASPF(VCHI2/VDOF)<6.0)")
@@ -209,8 +141,6 @@ tuple.ToolList += [
     , "TupleToolTrackInfo"
     , "TupleToolVtxIsoln"
     , "TupleToolPhotonInfo"
-    , "TupleToolMCTruth"
-    , "TupleToolMCBackgroundInfo"
     , "TupleToolCaloHypo"
     , "TupleToolRecoStats"
     , "TupleToolTrackIsolation"
@@ -226,17 +156,23 @@ tuple.addTool(TupleToolDecay,name="eta_prime")
 from Configurables import TupleToolDecayTreeFitter
 
 #===========================REFIT WITH JUST PV CONSTRAINED======================
-tuple.Bu.addTupleTool('TupleToolDecayTreeFitter/DTF')
-tuple.Bu.DTF.Verbose=False
-tuple.Bu.DTF.constrainToOriginVertex=True
-tuple.Bu.DTF.UpdateDaughters = True
+tuple.Bu.addTupleTool('TupleToolDecayTreeFitter/DTF_nc')
+tuple.Bu.DTF_nc.Verbose=False
+tuple.Bu.DTF_nc.constrainToOriginVertex=False
+tuple.Bu.DTF_nc.UpdateDaughters = True
 
 #===========================REFIT WITH JUST PV CONSTRAINED======================
-tuple.Bu.addTupleTool('TupleToolDecayTreeFitter/DTFEtapFixed')
-tuple.Bu.DTFEtapFixed.daughtersToConstrain = ["eta_prime"]
-tuple.Bu.DTFEtapFixed.Verbose=True
-tuple.Bu.DTFEtapFixed.constrainToOriginVertex=False
-tuple.Bu.DTFEtapFixed.UpdateDaughters = True
+tuple.Bu.addTupleTool('TupleToolDecayTreeFitter/DTF_orivert')
+tuple.Bu.DTF_orivert.Verbose=False
+tuple.Bu.DTF_orivert.constrainToOriginVertex=True
+tuple.Bu.DTF_orivert.UpdateDaughters = True
+
+#===========================REFIT WITH JUST PV CONSTRAINED======================
+tuple.Bu.addTupleTool('TupleToolDecayTreeFitter/DTF')
+tuple.Bu.DTF.daughtersToConstrain = ["eta_prime"]
+tuple.Bu.DTF.Verbose=True
+tuple.Bu.DTF.constrainToOriginVertex=False
+tuple.Bu.DTF.UpdateDaughters = True
 
 #==============================REFIT WITH K SWAPPED FOR PI ALL CONSTRAINED ==============================
 tuple.Bu.addTupleTool('TupleToolDecayTreeFitter/DTFKforpi')
@@ -371,22 +307,6 @@ tistos.TriggerList=["L0PhotonDecision",
                     "Hlt2Topo3BodySimpleDecision",
                     "Hlt2Topo4BodySimpleDecision"]
 
-from Configurables import TupleToolMCTruth
-tuple.addTool(TupleToolMCTruth)
-tuple.ToolList += ["TupleToolMCTruth"]
-tuple.TupleToolMCTruth.ToolList += [
-	"MCTupleToolHierarchy",
-	"MCTupleToolKinematic",
-	#    "MCTupleToolDecayType",
-	#   "MCTupleToolReconstructed",
-	#  "MCTupleToolPID",
-	# "MCTupleToolP2VV",
-	#    "MCTupleToolAngles",
-	#    "MCTupleToolInteractions",
-	#   "MCTupleToolPrimaries",
-	#  "MCTupleToolPrompt"
-	]
-
 from Configurables import TupleToolL0Calo
 
 tuple.Kaon.addTool(TupleToolL0Calo,name="KaonL0Calo")
@@ -404,19 +324,10 @@ tuple.piminus.piminusL0Calo.WhichCalo="HCAL"
 etuple=EventTuple()
 etuple.ToolList=["TupleToolEventInfo"]
 
-from Configurables import MCDecayTreeTuple
-mctuple=MCDecayTreeTuple("mctuple")
-mctuple.ToolList+=["MCTupleToolKinematic","MCTupleToolReconstructed","MCTupleToolHierarchy","MCTupleToolDecayType","MCTupleToolPID"]
-
-mctuple.Decay="[[B+]cc -> ^K+ ^(eta_prime -> ^(rho(770)0 -> ^pi+ ^pi-) ^gamma)]CC"
-
-
-
 Gseq=GaudiSequencer('MyTupleSeq')
 Gseq.Members += [BuKFilteredSel_Seq.sequence()]
 Gseq.Members.append(etuple)
 Gseq.Members += [tuple]
-Gseq.Members.append(mctuple)
 #DaVinci().EventPreFilters = fltrs.filters ('Filters')
 DaVinci().InputType='DST'
 #DaVinci().appendToMainSequence([Gseq])
@@ -424,18 +335,17 @@ DaVinci().UserAlgorithms+=[Gseq]
 DaVinci().TupleFile="Output.root"
 DaVinci().HistogramFile="histos.root"
 DaVinci().DataType='2012'
+DaVinci().Lumi=True
 DaVinci().EvtMax=-1
 DaVinci().PrintFreq=1000
 DaVinci().MoniSequence=[tuple]
-DaVinci().Simulation=True
-DaVinci.DDDBtag='dddb-20130929-1'
-DaVinci.CondDBtag='sim-20130522-1-vc-md100'
-
+DaVinci().Simulation=False
 
 from GaudiConf import IOHelper
 # Use the local input data
 IOHelper().inputFiles([
-        './MC_12_12103211.dst'
+        './Data_12.DST',
+       './data_12_2.dst'
 ], clear=True)
 
 
